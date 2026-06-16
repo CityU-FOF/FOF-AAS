@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>金融學院 - 自動證明生成系統</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- 引入外部圖標或字體（可選） -->
+</head>
+<body>
+    <div class="container">
+        <h1>第三行政系統：成績排名證明自動生成</h1>
+        
+        <div class="main-layout">
+            <!-- 左側：資料輸入區 -->
+            <div class="input-section">
+                <h2>1. 輸入學生個人資料</h2>
+                <form id="certForm">
+                    <div class="form-group">
+                        <label>中文姓名 / 英文姓名：</label>
+                        <input type="text" id="nameCn" value="陈亮" placeholder="中文姓名">
+                        <input type="text" id="nameEn" value="CHEN LIANG" placeholder="English Name">
+                    </div>
+                    <div class="form-group">
+                        <label>出生日期 / 性別：</label>
+                        <input type="text" id="dob" value="12/12/2003" placeholder="DD/MM/YYYY">
+                        <select id="gender">
+                            <option value="male" selected>男 / Male</option>
+                            <option value="female">女 / Female</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>入學年份 / 學號：</label>
+                        <input type="text" id="entryYear" value="2022" placeholder="例如: 2022">
+                        <input type="text" id="studentId" value="F22090107947">
+                    </div>
+                    <div class="form-group">
+                        <label>課程名稱 (中/英)：</label>
+                        <input type="text" id="progCn" value="應用經濟學學士學位課程 (中文學制)">
+                        <input type="text" id="progEn" value="Bachelor of Applied Economics (Chinese)">
+                    </div>
+                    <div class="form-group">
+                        <label>專業方向 (中/英)：</label>
+                        <input type="text" id="specCn" value="經濟學">
+                        <input type="text" id="specEn" value="Economics">
+                    </div>
+                    <div class="form-group">
+                        <label>身份證 / 港澳通行證：</label>
+                        <input type="text" id="idNo" value="330382200312124058">
+                        <input type="text" id="permitNo" value="CC4256792">
+                    </div>
+                    <hr>
+                    <h3>排名與成績資訊</h3>
+                    <div class="form-group">
+                        <label>證明學年學期 (中/英)：</label>
+                        <input type="text" id="yearCn" value="2022年8月至2023年7月">
+                        <input type="text" id="yearEn" value="August 2022 to July 2023">
+                    </div>
+                    <div class="form-group">
+                        <label>平均 GPA / 總人數：</label>
+                        <input type="text" id="gpa" value="3.82/4.0">
+                        <input type="number" id="totalStudents" value="284">
+                    </div>
+                    <div class="form-group">
+                        <label>名次 (數字) / 是否並列：</label>
+                        <input type="number" id="rankNum" value="10">
+                        <label><input type="checkbox" id="isShared" checked> 是否並列 (Shared)</label>
+                    </div>
+                    <div class="form-group">
+                        <label>簽發日期：</label>
+                        <input type="date" id="issueDate" value="2026-06-15">
+                    </div>
+                    
+                    <button type="button" id="btnDownload" class="btn-primary">一鍵生成並導出 Word (.docx)</button>
+                </form>
+            </div>
+            
+            <!-- 右側：即時預覽區（確保排版與真實證書類似） -->
+            <div class="preview-section">
+                <h2>2. 雙語模版即時預覽</h2>
+                <div id="previewContent" class="word-preview">
+                    <!-- JS 會在這裡動態渲染中英版內容 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
