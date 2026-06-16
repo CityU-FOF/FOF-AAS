@@ -3,87 +3,395 @@
 <head>
     <meta charset="UTF-8">
     <title>金融學院 - 自動證明生成系統</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- 引入外部圖標或字體（可選） -->
+    <style>
+        /* 界面美化樣式 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #1a365d;
+            margin-bottom: 30px;
+        }
+        .main-layout {
+            display: flex;
+            gap: 25px;
+        }
+        .input-section, .preview-section {
+            flex: 1;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-sizing: border-box;
+        }
+        .input-section {
+            max-width: 600px;
+        }
+        h2 {
+            font-size: 18px;
+            color: #2b6cb0;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        h3 {
+            font-size: 16px;
+            color: #4a5568;
+            margin-top: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #4a5568;
+        }
+        .form-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        input[type="text"], input[type="number"], input[type="date"], select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(66,153,225,0.5);
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+        hr {
+            border: 0;
+            border-top: 1px solid #e2e8f0;
+            margin: 25px 0;
+        }
+        .btn-primary {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #3182ce;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 20px;
+        }
+        .btn-primary:hover {
+            background-color: #2b6cb0;
+        }
+        /* 模擬 Word 頁面預覽樣式 */
+        .word-preview-container {
+            background: #edf2f7;
+            padding: 20px;
+            border-radius: 6px;
+            max-height: 750px;
+            overflow-y: auto;
+        }
+        .word-page {
+            background: white;
+            width: 100%;
+            min-height: 500px;
+            padding: 40px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+        }
+    </style>
 </head>
 <body>
+
     <div class="container">
         <h1>第三行政系統：成績排名證明自動生成</h1>
         
         <div class="main-layout">
-            <!-- 左側：資料輸入區 -->
             <div class="input-section">
                 <h2>1. 輸入學生個人資料</h2>
                 <form id="certForm">
                     <div class="form-group">
-                        <label>中文姓名 / 英文姓名：</label>
-                        <input type="text" id="nameCn" value="陈亮" placeholder="中文姓名">
-                        <input type="text" id="nameEn" value="CHEN LIANG" placeholder="English Name">
+                        <label>學生姓名（中 / 英）：</label>
+                        <div class="form-row">
+                            <input type="text" id="nameCn" value="陈亮" placeholder="中文姓名">
+                            <input type="text" id="nameEn" value="CHEN LIANG" placeholder="英文姓名 (大寫)">
+                        </div>
                     </div>
+                    
                     <div class="form-group">
                         <label>出生日期 / 性別：</label>
-                        <input type="text" id="dob" value="12/12/2003" placeholder="DD/MM/YYYY">
-                        <select id="gender">
-                            <option value="male" selected>男 / Male</option>
-                            <option value="female">女 / Female</option>
-                        </select>
+                        <div class="form-row">
+                            <input type="text" id="dob" value="12/12/2003" placeholder="例如: 12/12/2003">
+                            <select id="gender">
+                                <option value="male" selected>男 / Male</option>
+                                <option value="female">女 / Female</option>
+                            </select>
+                        </div>
                     </div>
+                    
                     <div class="form-group">
                         <label>入學年份 / 學號：</label>
-                        <input type="text" id="entryYear" value="2022" placeholder="例如: 2022">
-                        <input type="text" id="studentId" value="F22090107947">
+                        <div class="form-row">
+                            <input type="text" id="entryYear" value="2022" placeholder="例如: 2022">
+                            <input type="text" id="studentId" value="F22090107947" placeholder="學號">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>課程名稱 (中)：</label>
+                        <input type="text" id="progCn" value="應用經濟學學士學位課程 (中文學制)">
                     </div>
                     <div class="form-group">
-                        <label>課程名稱 (中/英)：</label>
-                        <input type="text" id="progCn" value="應用經濟學學士學位課程 (中文學制)">
+                        <label>課程名稱 (英)：</label>
                         <input type="text" id="progEn" value="Bachelor of Applied Economics (Chinese)">
                     </div>
+                    
                     <div class="form-group">
-                        <label>專業方向 (中/英)：</label>
-                        <input type="text" id="specCn" value="經濟學">
-                        <input type="text" id="specEn" value="Economics">
+                        <label>專業方向 (中 / 英)：</label>
+                        <div class="form-row">
+                            <input type="text" id="specCn" value="經濟學" placeholder="中文專業">
+                            <input type="text" id="specEn" value="Economics" placeholder="English Specialization">
+                        </div>
                     </div>
+                    
                     <div class="form-group">
-                        <label>身份證 / 港澳通行證：</label>
-                        <input type="text" id="idNo" value="330382200312124058">
-                        <input type="text" id="permitNo" value="CC4256792">
+                        <label>身份證號碼 / 港澳通行證：</label>
+                        <div class="form-row">
+                            <input type="text" id="idNo" value="330382200312124058" placeholder="身份證">
+                            <input type="text" id="permitNo" value="CC4256792" placeholder="通行證">
+                        </div>
                     </div>
+                    
                     <hr>
-                    <h3>排名與成績資訊</h3>
+                    <h2>2. 排名與成績資訊</h2>
+                    
                     <div class="form-group">
-                        <label>證明學年學期 (中/英)：</label>
+                        <label>證明學年學期 (中)：</label>
                         <input type="text" id="yearCn" value="2022年8月至2023年7月">
+                    </div>
+                    <div class="form-group">
+                        <label>證明學年學期 (英)：</label>
                         <input type="text" id="yearEn" value="August 2022 to July 2023">
                     </div>
+                    
                     <div class="form-group">
-                        <label>平均 GPA / 總人數：</label>
-                        <input type="text" id="gpa" value="3.82/4.0">
-                        <input type="number" id="totalStudents" value="284">
+                        <label>平均 GPA / 學院總人數：</label>
+                        <div class="form-row">
+                            <input type="text" id="gpa" value="3.82/4.0" placeholder="GPA">
+                            <input type="number" id="totalStudents" value="284" placeholder="總人數">
+                        </div>
                     </div>
+                    
                     <div class="form-group">
-                        <label>名次 (數字) / 是否並列：</label>
-                        <input type="number" id="rankNum" value="10">
-                        <label><input type="checkbox" id="isShared" checked> 是否並列 (Shared)</label>
+                        <label>名次 (純數字) / 是否並列：</label>
+                        <div class="form-row" style="align-items: center;">
+                            <input type="number" id="rankNum" value="10" style="width: 50%;">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="isShared" checked> 屬於「並列」排名
+                            </label>
+                        </div>
                     </div>
+                    
                     <div class="form-group">
                         <label>簽發日期：</label>
                         <input type="date" id="issueDate" value="2026-06-15">
                     </div>
                     
-                    <button type="button" id="btnDownload" class="btn-primary">一鍵生成並導出 Word (.docx)</button>
+                    <button type="button" id="btnDownload" class="btn-primary">一鍵生成並導出 Word (.doc)</button>
                 </form>
             </div>
             
-            <!-- 右側：即時預覽區（確保排版與真實證書類似） -->
             <div class="preview-section">
-                <h2>2. 雙語模版即時預覽</h2>
-                <div id="previewContent" class="word-preview">
-                    <!-- JS 會在這裡動態渲染中英版內容 -->
-                </div>
+                <h2>3. 雙語模版即時預覽</h2>
+                <div class="word-preview-container" id="previewContent">
+                    </div>
             </div>
         </div>
     </div>
-    
-    <script src="script.js"></script>
+
+    <script>
+        // JS 邏輯控制
+        document.addEventListener('DOMContentLoaded', function() {
+            // 自動監聽所有輸入框的變動
+            const inputs = document.querySelectorAll('input, select');
+            inputs.forEach(input => input.addEventListener('input', updatePreview));
+            
+            // 下載按鈕監聽
+            document.getElementById('btnDownload').addEventListener('click', downloadWord);
+            
+            // 預設日期設定為今天 (選填，目前固定模版日期 2026-06-15)
+            // document.getElementById('issueDate').value = new Date().toISOString().split('T')[0];
+            
+            // 初始化預覽畫面
+            updatePreview();
+        });
+
+        // 數字轉英文序數工具 (1 -> 1st, 2 -> 2nd, 10 -> 10th)
+        function getOrdinalSuffix(num) {
+            const j = num % 10, k = num % 100;
+            if (j == 1 && k != 11) return num + "st";
+            if (j == 2 && k != 12) return num + "nd";
+            if (j == 3 && k != 13) return num + "rd";
+            return num + "th";
+        }
+
+        // 日期格式化處理
+        function formatDate(dateStr) {
+            if (!dateStr) return { cn: '', en: '' };
+            const d = new Date(dateStr);
+            const yy = d.getFullYear();
+            const mm = d.getMonth() + 1;
+            const dd = d.getDate();
+            return {
+                cn: `${yy}年${mm}月${dd}日`,
+                en: `${yy}/${mm}/${dd}`
+            };
+        }
+
+        // 收集資料並拼裝 HTML
+        function generateCertHtml() {
+            const data = {
+                nameCn: document.getElementById('nameCn').value,
+                nameEn: document.getElementById('nameEn').value.toUpperCase(),
+                dob: document.getElementById('dob').value,
+                genderCn: document.getElementById('gender').value === 'male' ? '男' : '女',
+                genderEn: document.getElementById('gender').value === 'male' ? 'Male' : 'Female',
+                entryYear: document.getElementById('entryYear').value,
+                studentId: document.getElementById('studentId').value,
+                progCn: document.getElementById('progCn').value,
+                progEn: document.getElementById('progEn').value,
+                specCn: document.getElementById('specCn').value,
+                specEn: document.getElementById('specEn').value,
+                idNo: document.getElementById('idNo').value,
+                permitNo: document.getElementById('permitNo').value,
+                yearCn: document.getElementById('yearCn').value,
+                yearEn: document.getElementById('yearEn').value,
+                gpa: document.getElementById('gpa').value,
+                totalStudents: document.getElementById('totalStudents').value,
+                rankNum: parseInt(document.getElementById('rankNum').value) || 0,
+                isShared: document.getElementById('isShared').checked,
+                date: formatDate(document.getElementById('issueDate').value)
+            };
+
+            // 根據數據動態組合中英文排名詞彙
+            const rankCn = data.isShared ? `並列第${data.rankNum}` : `第${data.rankNum}`;
+            const rankEn = data.isShared ? `shared the ${getOrdinalSuffix(data.rankNum)} place` : `ranked ${getOrdinalSuffix(data.rankNum)} place`;
+            const pronoun = data.genderEn === 'Male' ? 'his' : 'her';
+
+            // 返回分頁包裝的 HTML
+            return `
+                <div class="word-page" style="font-family: Arial, sans-serif; line-height: 1.6; color: #000; font-size: 15px;">
+                    <h3 style="text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 25px;">證 明</h3>
+                    <table border="1" cellspacing="0" cellpadding="8" style="width:100%; border-collapse:collapse; margin-bottom:25px; font-size:14px; border: 1px solid #000;">
+                        <tr><td style="width:18%;">姓名：</td><td style="width:32%;">${data.nameCn}</td><td style="width:18%;">出生日期：</td><td style="width:32%;">${data.dob}</td></tr>
+                        <tr><td>性別：</td><td>${data.genderCn}</td><td>入學年：</td><td>${data.entryYear}年</td></tr>
+                        <tr><td>學院：</td><td>金融學院</td><td>學號：</td><td>${data.studentId}</td></tr>
+                        <tr><td>課程：</td><td colspan="3">${data.progCn}</td></tr>
+                        <tr><td>專業方向：</td><td colspan="3">${data.specCn}</td></tr>
+                        <tr><td>身份證：</td><td>${data.idNo}</td><td>港澳通行證：</td><td>${data.permitNo}</td></tr>
+                    </table>
+                    <p style="text-indent: 30px; text-align: justify; margin-bottom: 40px;">
+                        茲證明 ${data.nameCn} 於${data.yearCn}平均績點為${data.gpa}，在${data.entryYear}級金融學院${data.totalStudents}名本科生中績點${rankCn}。
+                    </p>
+                    <p style="text-indent: 30px; margin-bottom: 60px;">特此證明。</p>
+                    <div style="text-align: right; line-height: 1.5;">
+                        澳門城市大學<br>金融學院<br>${data.date.cn}
+                    </div>
+                </div>
+
+                <div class="word-page" style="font-family: Arial, sans-serif; line-height: 1.6; color: #000; font-size: 15px;">
+                    <h3 style="text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 25px;">Certificate</h3>
+                    <table border="1" cellspacing="0" cellpadding="8" style="width:100%; border-collapse:collapse; margin-bottom:25px; font-size:14px; border: 1px solid #000;">
+                        <tr><td style="width:22%;">Name:</td><td style="width:28%;">${data.nameEn}</td><td style="width:22%;">Date of Birth:</td><td style="width:28%;">${data.dob}</td></tr>
+                        <tr><td>Gender:</td><td>${data.genderEn}</td><td>Entry Year:</td><td>${data.entryYear}</td></tr>
+                        <tr><td>Department:</td><td>Faculty of Finance</td><td>Student ID:</td><td>${data.studentId}</td></tr>
+                        <tr><td>Programme:</td><td colspan="3">${data.progEn}</td></tr>
+                        <tr><td>Specialization:</td><td colspan="3">${data.specEn}</td></tr>
+                        <tr><td>ID No.</td><td>${data.idNo}</td><td>Exit-Entry Permit No.</td><td>${data.permitNo}</td></tr>
+                    </table>
+                    <p style="text-align: justify; margin-bottom: 60px;">
+                        This is to certify that ${data.nameEn} with a general GPA of ${data.gpa} ${rankEn} among ${data.totalStudents} students during ${pronoun} study from ${data.yearEn} in Faculty of Finance.
+                    </p>
+                    <div style="text-align: right; line-height: 1.5;">
+                        Faculty of Finance<br>City University of Macau<br>${data.date.en}
+                    </div>
+                </div>
+            `;
+        }
+
+        // 更新右邊網頁預覽
+        function updatePreview() {
+            document.getElementById('previewContent').innerHTML = generateCertHtml();
+        }
+
+        // 封裝並下載成 Word 檔案
+        function downloadWord() {
+            const htmlContent = generateCertHtml();
+            const nameCn = document.getElementById('nameCn').value;
+            const entryYear = document.getElementById('entryYear').value;
+            
+            // 建立含 Word 核心 XML Schema 的 HTML 字串，確保分頁符(page-break)能被 Word 讀取
+            const fullHtml = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                <head>
+                    <title>Certificate</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; }
+                        .word-page { padding: 0; margin: 0; background: none; box-shadow: none; }
+                        /* 叫 Word 喺呢度強制分頁 */
+                        .page-break { page-break-before: always; }
+                    </style>
+                </head>
+                <body>
+                    ${htmlContent.replace('', '<br class="page-break" /> ')}
+                </body>
+                </html>
+            `;
+            
+            // 轉為 Blob 數據流
+            const blob = new Blob(['\ufeff' + fullHtml], {
+                type: 'application/msword;charset=utf-8'
+            });
+            
+            // 執行瀏覽器下載
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `FOF2526-ST323-${entryYear}學年成績排名證明-${nameCn}.doc`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
 </body>
 </html>
