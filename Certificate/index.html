@@ -44,11 +44,6 @@
             margin-top: 0;
             margin-bottom: 20px;
         }
-        h3 {
-            font-size: 16px;
-            color: #4a5568;
-            margin-top: 20px;
-        }
         .form-group {
             margin-bottom: 15px;
         }
@@ -116,13 +111,13 @@
             background: #edf2f7;
             padding: 20px;
             border-radius: 6px;
-            max-height: 750px;
+            max-height: 800px;
             overflow-y: auto;
         }
         .word-page {
             background: white;
             width: 100%;
-            min-height: 500px;
+            min-height: 520px;
             padding: 40px;
             margin-bottom: 20px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -133,10 +128,20 @@
 <body>
 
     <div class="container">
-        <h1>第三行政系統：成績排名證明自動生成</h1>
+        <h1>第三行政系統：學院證明自動生成系統</h1>
         
         <div class="main-layout">
             <div class="input-section">
+                <h2>0. 選擇證明信類型</h2>
+                <div class="form-group">
+                    <select id="certType" style="background-color: #ebf8ff; font-weight: bold; border-color: #bee3f8;">
+                        <option value="ranking" selected>📜 成績排名證明 (中英雙語)</option>
+                        <option value="course" disabled>🔒 專業科目證明信 (即將推出...)</option>
+                        <option value="warning" disabled>🔒 學生警告信 (即將推出...)</option>
+                        <option value="senior" disabled>🔒 大四學習科目證明 (即將推出...)</option>
+                    </select>
+                </div>
+
                 <h2>1. 輸入學生個人資料</h2>
                 <form id="certForm">
                     <div class="form-group">
@@ -159,7 +164,7 @@
                     </div>
                     
                     <div class="form-group">
-                        <label>入學年份 / 學號：</label>
+                        <label>入學年份 (Class of) / 學號：</label>
                         <div class="form-row">
                             <input type="text" id="entryYear" value="2022" placeholder="例如: 2022">
                             <input type="text" id="studentId" value="F22090107947" placeholder="學號">
@@ -184,7 +189,7 @@
                     </div>
                     
                     <div class="form-group">
-                        <label>身份證號碼 / 港澳通行證：</label>
+                        <label>身份證號碼 / 港澳通行證號碼：</label>
                         <div class="form-row">
                             <input type="text" id="idNo" value="330382200312124058" placeholder="身份證">
                             <input type="text" id="permitNo" value="CC4256792" placeholder="通行證">
@@ -290,11 +295,11 @@
                 date: formatDate(document.getElementById('issueDate').value)
             };
 
+            // 採用更專業的學術措辭: jointly ranked 10th
             const rankCn = data.isShared ? `並列第${data.rankNum}` : `第${data.rankNum}`;
-            const rankEn = data.isShared ? `shared the ${getOrdinalSuffix(data.rankNum)} place` : `ranked ${getOrdinalSuffix(data.rankNum)} place`;
+            const rankEn = data.isShared ? `jointly ranked ${getOrdinalSuffix(data.rankNum)}` : `ranked ${getOrdinalSuffix(data.rankNum)}`;
             const pronoun = data.genderEn === 'Male' ? 'his' : 'her';
 
-            // 定義字體與行距樣式 (中文字體用標楷體，英文字體與數字用 Times New Roman)
             const styleCn = "font-family: '標楷體', 'DFKai-SB', 'BiauKai', serif; line-height: 1.75; color: #000; font-size: 16px;";
             const styleEn = "font-family: 'Times New Roman', serif; line-height: 1.75; color: #000; font-size: 15px;";
             const styleTable = "width:100%; border-collapse:collapse; margin-bottom:25px; font-size:15px; border:none;";
@@ -324,15 +329,15 @@
                     <h3 style="text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 30px;">Certificate</h3>
                     
                     <table border="0" cellspacing="0" cellpadding="6" style="${styleTable}">
-                        <tr style="${styleEn}"><td style="width:18%;">Name:</td><td style="width:32%;">${data.nameEn}</td><td style="width:22%;">Date of Birth:</td><td style="width:28%;">${data.dob}</td></tr>
-                        <tr style="${styleEn}"><td>Gender:</td><td>${data.genderEn}</td><td>Entry Year:</td><td>${data.entryYear}</td></tr>
+                        <tr style="${styleEn}"><td style="width:18%;">Name:</td><td style="width:32%;">${data.nameEn}</td><td style="width:25%;">Date of Birth:</td><td style="width:25%;">${data.dob}</td></tr>
+                        <tr style="${styleEn}"><td>Gender:</td><td>${data.genderEn}</td><td>Class of:</td><td>${data.entryYear}</td></tr>
                         <tr style="${styleEn}"><td>Department:</td><td>Faculty of Finance</td><td>Student ID:</td><td>${data.studentId}</td></tr>
-                        <tr style="${styleEn}"><td>Programme:</td><td style="width:42%;">${data.progEn}</td><td style="width:18%;">Specialization:</td><td style="width:22%;">${data.specEn}</td></tr>
-                        <tr style="${styleEn}"><td>ID No.</td><td>${data.idNo}</td><td>Exit-Entry Permit No.</td><td>${data.permitNo}</td></tr>
+                        <tr style="${styleEn}"><td>Programme:</td><td style="width:40%;">${data.progEn}</td><td style="width:18%;">Specialization:</td><td style="width:24%;">${data.specEn}</td></tr>
+                        <tr style="${styleEn}"><td>ID No.</td><td>${data.idNo}</td><td>EEP No.</td><td>${data.permitNo}</td></tr>
                     </table>
                     
                     <p style="text-align: justify; margin-bottom: 60px;">
-                        This is to certify that ${data.nameEn} with a general GPA of ${data.gpa} ${rankEn} among ${data.totalStudents} students during ${pronoun} study from ${data.yearEn} in Faculty of Finance.
+                        This is to certify that ${data.nameEn} (Class of ${data.entryYear}) with a general GPA of ${data.gpa} ${rankEn} among ${data.totalStudents} students during ${pronoun} study from ${data.yearEn} in Faculty of Finance.
                     </p>
                     <div style="text-align: right; line-height: 1.6;">
                         Faculty of Finance<br>City University of Macau<br>${data.date.en}
@@ -358,7 +363,6 @@
                         body { font-family: Arial, sans-serif; }
                         .word-page { padding: 0; margin: 0; background: none; box-shadow: none; }
                         .page-break { page-break-before: always; }
-                        /* 確保 Word 導出時完全不顯示表格邊框 */
                         table, td { border: none !important; }
                     </style>
                 </head>
