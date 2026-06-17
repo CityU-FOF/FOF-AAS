@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>金融學院 - 自動證明生成系統</title>
     <style>
-        /* 界面美化樣式 */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #f5f7fa;
@@ -106,12 +105,11 @@
         .btn-primary:hover {
             background-color: #2b6cb0;
         }
-        /* 模擬 Word 頁面預覽樣式 */
         .word-preview-container {
             background: #edf2f7;
             padding: 20px;
             border-radius: 6px;
-            max-height: 800px;
+            max-height: 850px;
             overflow-y: auto;
         }
         .word-page {
@@ -131,7 +129,6 @@
         <h1>第三行政系統：學院證明自動生成系統</h1>
         
         <div class="main-layout">
-            <!-- 左側：資料輸入區 -->
             <div class="input-section">
                 <h2>0. 選擇證明信類型</h2>
                 <div class="form-group">
@@ -148,8 +145,8 @@
                     <div class="form-group">
                         <label>學生姓名（中 / 英）：</label>
                         <div class="form-row">
-                            <input type="text" id="nameCn" value="陈亮" placeholder="中文姓名">
-                            <input type="text" id="nameEn" value="CHEN LIANG" placeholder="英文姓名 (大寫)">
+                            <input type="text" id="nameCn" value="陈佳楠" placeholder="中文姓名">
+                            <input type="text" id="nameEn" value="CHEN JIANAN" placeholder="英文姓名 (大寫)">
                         </div>
                     </div>
                     
@@ -158,8 +155,8 @@
                         <div class="form-row">
                             <input type="date" id="dob" value="2003-12-12">
                             <select id="gender">
-                                <option value="male" selected>男 / Male</option>
-                                <option value="female">女 / Female</option>
+                                <option value="female" selected>女 / Female</option>
+                                <option value="male">男 / Male</option>
                             </select>
                         </div>
                     </div>
@@ -168,9 +165,8 @@
                         <label>入學年份 / 學號：</label>
                         <div class="form-row">
                             <select id="entryYear">
-                                <!-- 由 JS 動態生成 2020 至 2030 -->
-                            </select>
-                            <input type="text" id="studentId" value="F22090107947" placeholder="學號">
+                                </select>
+                            <input type="text" id="studentId" value="F2309010XXXX" placeholder="學號">
                         </div>
                     </div>
                     
@@ -194,7 +190,7 @@
                     <div class="form-group">
                         <label>身份證號碼 / 港澳通行證號碼：</label>
                         <div class="form-row">
-                            <input type="text" id="idNo" value="330382200312124058" placeholder="身份證">
+                            <input type="text" id="idNo" value="33038220031212XXXX" placeholder="身份證">
                             <input type="text" id="permitNo" value="CC4256792" placeholder="通行證">
                         </div>
                     </div>
@@ -214,17 +210,19 @@
                     </div>
                     
                     <div class="form-group">
-                        <label>平均 GPA / 學院總人數：</label>
-                        <div class="form-row">
-                            <input type="text" id="gpa" value="3.82/4.0" placeholder="GPA">
-                            <input type="number" id="totalStudents" value="284" placeholder="總人數">
-                        </div>
+                        <label>平均 GPA（只需輸入數字，例如 3.94）：</label>
+                        <input type="text" id="gpa" value="3.94" placeholder="例如: 3.94">
+                    </div>
+
+                    <div class="form-group">
+                        <label id="totalStudentsLabel">該學年總人數（系統偵測大三大四將自動轉為專業人數）：</label>
+                        <input type="number" id="totalStudents" value="41" placeholder="總人數">
                     </div>
                     
                     <div class="form-group">
                         <label>名次 (純數字) / 是否並列：</label>
                         <div class="form-row" style="align-items: center;">
-                            <input type="number" id="rankNum" value="10" style="width: 50%;">
+                            <input type="number" id="rankNum" value="1" style="width: 50%;">
                             <label class="checkbox-label">
                                 <input type="checkbox" id="isShared" checked> 屬於「並列」排名
                             </label>
@@ -240,39 +238,24 @@
                 </form>
             </div>
             
-            <!-- 右側：即時預覽區 -->
             <div class="preview-section">
                 <h2>3. 雙語模版即時預覽</h2>
                 <div class="word-preview-container" id="previewContent">
-                    <!-- JS 動態生成內容 -->
-                </div>
+                    </div>
             </div>
         </div>
     </div>
 
     <script>
-        // 靜態對照表
         const progMapping = {
-            bachelor: {
-                cn: "應用經濟學學士學位課程 (中文學制)",
-                en: "Bachelor of Applied Economics (Chinese)",
-                isMaster: false
-            },
-            master_finance: {
-                cn: "金融學碩士學位課程（中文學制）",
-                en: "Master of Science in Finance（Chinese）",
-                isMaster: true
-            },
-            master_fintech: {
-                cn: "金融科技碩士學位課程",
-                en: "Master of Science in Financial Technology",
-                isMaster: true
-            }
+            bachelor: { cn: "應用經濟學學士學位課程 (中文學制)", en: "Bachelor of Applied Economics (Chinese)", isMaster: false },
+            master_finance: { cn: "金融學碩士學位課程（中文學制）", en: "Master of Science in Finance（Chinese）", isMaster: true },
+            master_fintech: { cn: "金融科技碩士學位課程", en: "Master of Science in Financial Technology", isMaster: true }
         };
 
         const specMapping = {
-            economics: { cn: "經濟學", en: "Economics" },
-            finance: { cn: "金融學", en: "Finance" }
+            economics: { cn: "經濟學方向", en: "specializing in Economics" },
+            finance: { cn: "金融學方向", en: "specializing in Finance" }
         };
 
         const monthEnMapping = {
@@ -285,20 +268,20 @@
             
             const inputs = document.querySelectorAll('input, select');
             inputs.forEach(input => input.addEventListener('input', function() {
-                if (this.id === 'programme') {
+                if (this.id === 'programme' || this.id === 'entryYear' || this.id === 'endYear') {
                     toggleSpecializationField();
+                    updateLabelHint();
                 }
                 updatePreview();
             }));
             
             document.getElementById('btnDownload').addEventListener('click', downloadWord);
             
-            // 初始檢查與預覽
             toggleSpecializationField();
+            updateLabelHint();
             updatePreview();
         });
 
-        // 初始化所有年份同月份嘅下拉選單
         function initSelectOptions() {
             const entryYearSel = document.getElementById('entryYear');
             const startYearSel = document.getElementById('startYear');
@@ -306,28 +289,23 @@
             const startMonthSel = document.getElementById('startMonth');
             const endMonthSel = document.getElementById('endMonth');
 
-            // 生成 2020-2030 年份
             for (let y = 2020; y <= 2030; y++) {
                 entryYearSel.add(new Option(`${y}年`, y));
                 startYearSel.add(new Option(`${y}年`, y));
                 endYearSel.add(new Option(`${y}年`, y));
             }
-            // 預設年份
-            entryYearSel.value = "2022";
-            startYearSel.value = "2022";
-            endYearSel.value = "2023";
+            entryYearSel.value = "2023";
+            startYearSel.value = "2025";
+            endYearSel.value = "2026";
 
-            // 生成 1-12 月份
             for (let m = 1; m <= 12; m++) {
                 startMonthSel.add(new Option(`${m}月`, m));
                 endMonthSel.add(new Option(`${m}月`, m));
             }
-            // 預設月份
             startMonthSel.value = "8";
             endMonthSel.value = "7";
         }
 
-        // 控制專業方向欄位嘅顯示與隱藏（碩士隱藏）
         function toggleSpecializationField() {
             const progKey = document.getElementById('programme').value;
             const specGroup = document.getElementById('specializationGroup');
@@ -335,6 +313,22 @@
                 specGroup.style.display = 'none';
             } else {
                 specGroup.style.display = 'block';
+            }
+        }
+
+        // 提示標籤更新，方便行政人員操作
+        function updateLabelHint() {
+            const entryYear = parseInt(document.getElementById('entryYear').value);
+            const endYear = parseInt(document.getElementById('endYear').value);
+            const progKey = document.getElementById('programme').value;
+            const label = document.getElementById('totalStudentsLabel');
+            
+            if (!progMapping[progKey].isMaster && (endYear - entryYear >= 3)) {
+                label.innerText = "該學年總人數（系統偵測：大三/大四 已分方向人數）：";
+            } else if (!progMapping[progKey].isMaster) {
+                label.innerText = "該學年總人數（系統偵測：大一/大二 學院總人數）：";
+            } else {
+                label.innerText = "該學年總人數（碩士課程）：";
             }
         }
 
@@ -346,7 +340,6 @@
             return num + "th";
         }
 
-        // 日期全寫格式化 (例如: 2026-06-15 -> cn: 2026年6月15日, en: 15 June 2026)
         function formatFullDate(dateStr) {
             if (!dateStr) return { cn: '', en: '' };
             const d = new Date(dateStr);
@@ -365,7 +358,6 @@
             const specKey = document.getElementById('specialization').value;
             const specData = specMapping[specKey];
 
-            // 處理學年時間段下拉數據
             const sY = document.getElementById('startYear').value;
             const sM = document.getElementById('startMonth').value;
             const eY = document.getElementById('endYear').value;
@@ -373,6 +365,10 @@
 
             const academicYearCn = `${sY}年${sM}月至${eY}年${eM}月`;
             const academicYearEn = `${monthEnMapping[sM]} ${sY} to ${monthEnMapping[eM]} ${eY}`;
+
+            // 處理 GPA，自動補齊 /4.0
+            let rawGpa = document.getElementById('gpa').value.trim();
+            const displayGpa = rawGpa.includes('/4.0') ? rawGpa : `${rawGpa}/4.0`;
 
             const data = {
                 nameCn: document.getElementById('nameCn').value,
@@ -384,61 +380,80 @@
                 studentId: document.getElementById('studentId').value,
                 idNo: document.getElementById('idNo').value,
                 permitNo: document.getElementById('permitNo').value,
-                gpa: document.getElementById('gpa').value,
                 totalStudents: document.getElementById('totalStudents').value,
                 rankNum: parseInt(document.getElementById('rankNum').value) || 0,
                 isShared: document.getElementById('isShared').checked,
                 date: formatFullDate(document.getElementById('issueDate').value)
             };
 
-            const rankCn = data.isShared ? `並列第${data.rankNum}` : `第${data.rankNum}`;
+            // 優化點 1：根據是否並列，完美切換「並列/排列」
+            const rankCn = data.isShared ? `並列第${data.rankNum}` : `排列第${data.rankNum}`;
             const rankEn = data.isShared ? `jointly ranked ${getOrdinalSuffix(data.rankNum)}` : `ranked ${getOrdinalSuffix(data.rankNum)}`;
             const pronoun = data.genderEn === 'Male' ? 'his' : 'her';
+
+            // 優化點 3：智能判斷大幾並自動切換文案
+            let isSeniorUndergrad = (!progData.isMaster && (parseInt(eY) - parseInt(data.entryYear) >= 3));
+            
+            let scopeCn = '';
+            let scopeEn = '';
+
+            if (progData.isMaster) {
+                scopeCn = `在${data.entryYear}級金融學院${data.totalStudents}名碩士生中`;
+                scopeEn = `among ${data.totalStudents} students in Faculty of Finance`;
+            } else if (isSeniorUndergrad) {
+                // 大三、大四已分專業方向文案
+                scopeCn = `在${data.entryYear}級金融學院${specMapping[specKey].cn}${data.totalStudents}名本科生中`;
+                scopeEn = `among ${data.totalStudents} students ${specMapping[specKey].en} during ${pronoun} study from ${academicYearEn} in Faculty of Finance`;
+            } else {
+                // 大一、大二未分專業方向文案
+                scopeCn = `在${data.entryYear}級金融學院${data.totalStudents}名本科生中`;
+                scopeEn = `among ${data.totalStudents} students during ${pronoun} study from ${academicYearEn} in Faculty of Finance`;
+            }
 
             const styleCn = "font-family: '標楷體', 'DFKai-SB', 'BiauKai', serif; line-height: 1.75; color: #000; font-size: 16px;";
             const styleEn = "font-family: 'Times New Roman', serif; line-height: 1.75; color: #000; font-size: 15px;";
             const styleTable = "width:100%; border-collapse:collapse; margin-bottom:25px; font-size:15px; border:none;";
 
-            // 根據是否為碩士課程，動態渲染表格中「課程與專業」那一列
             let tableRowCn = '';
             let tableRowEn = '';
 
             if (progData.isMaster) {
-                // 碩士課程：刪除專業方向，單獨一行列出課程
                 tableRowCn = `<tr style="${styleCn}"><td>課程：</td><td colspan="3">${progData.cn}</td></tr>`;
                 tableRowEn = `<tr style="${styleEn}"><td>Programme:</td><td colspan="3">${progData.en}</td></tr>`;
             } else {
-                // 本科課程：課程與專業方向合併在同一行
-                tableRowCn = `<tr style="${styleCn}"><td>課程：</td><td style="width:45%;">${progData.cn}</td><td style="width:15%;">專業方向：</td><td style="width:25%;">${specData.cn}</td></tr>`;
-                tableRowEn = `<tr style="${styleEn}"><td>Programme:</td><td style="width:40%;">${progData.en}</td><td style="width:18%;">Specialization:</td><td style="width:24%;">${specData.en}</td></tr>`;
+                // 本科生表格上方永遠保留原本格式
+                const specRaw = specKey === 'economics' ? '經濟學' : '金融學';
+                const specRawEn = specKey === 'economics' ? 'Economics' : 'Finance';
+                tableRowCn = `<tr style="${styleCn}"><td>課程：</td><td style="width:45%;">${progData.cn}</td><td style="width:15%;">專業方向：</td><td style="width:25%;">${specRaw}</td></tr>`;
+                tableRowEn = `<tr style="${styleEn}"><td>Programme:</td><td style="width:40%;">${progData.en}</td><td style="width:18%;">Specialization:</td><td style="width:24%;">${specRawEn}</td></tr>`;
             }
 
+            // 處理正文字體數字
+            const textCn = `茲證明 ${data.nameCn} 於<span style="font-family:'Times New Roman';">${academicYearCn.replace(/\d+/g, m => `<span style="font-family:'Times New Roman';">${m}</span>`)}</span>平均績點為<span style="font-family:'Times New Roman';">${displayGpa}</span>，${scopeCn.replace(/\d+/g, m => `<span style="font-family:'Times New Roman';">${m}</span>`)}績點${rankCn.replace(/\d+/g, m => `<span style="font-family:'Times New Roman';">${m}</span>`)}。`;
+
+            const textEn = isSeniorUndergrad 
+                ? `This is to certify that ${data.nameEn} (Class of ${data.entryYear}) with a general GPA of ${displayGpa} ${rankEn} ${scopeEn}.`
+                : `This is to certify that ${data.nameEn} (Class of ${data.entryYear}) with a general GPA of ${displayGpa} ${rankEn} ${scopeEn}.`;
+
             return `
-                <!-- 中文頁面 -->
                 <div class="word-page-cn" style="${styleCn}">
                     <h3 style="text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 30px; font-family: '標楷體', 'DFKai-SB';">證 明</h3>
-                    
                     <table border="0" cellspacing="0" cellpadding="6" style="${styleTable}">
-                        <tr style="${styleCn}"><td style="width:15%;">姓名：</td><td style="width:35%;">${data.nameCn}</td><td style="width:18%;">出生日期：</td><td style="width:32%;">${data.dob.cn}</td></tr>
+                        <tr style="${styleCn}"><td style="width:15%;">姓名：</td><td style="width:35%;">${data.nameCn}</td><td style="width:18%;">出生日期：</td><td style="width:32%; font-family:'Times New Roman';">${data.dob.cn}</td></tr>
                         <tr style="${styleCn}"><td>性別：</td><td>${data.genderCn}</td><td>入學年：</td><td><span style="font-family:'Times New Roman';">${data.entryYear}</span>年</td></tr>
                         <tr style="${styleCn}"><td>學院：</td><td>金融學院</td><td>學號：</td><td style="font-family:'Times New Roman';">${data.studentId}</td></tr>
                         ${tableRowCn}
                         <tr style="${styleCn}"><td>身份證：</td><td style="font-family:'Times New Roman';">${data.idNo}</td><td>港澳通行證：</td><td style="font-family:'Times New Roman';">${data.permitNo}</td></tr>
                     </table>
-                    
-                    <p style="text-indent: 32px; text-align: justify; margin-bottom: 40px;">
-                        茲證明 ${data.nameCn} 於<span style="font-family:'Times New Roman';">${academicYearCn.replace(/\d+/g, m => `<span style="font-family:'Times New Roman';">${m}</span>`)}</span>平均績點為<span style="font-family:'Times New Roman';">${data.gpa}</span>，在<span style="font-family:'Times New Roman';">${data.entryYear}</span>級金融學院<span style="font-family:'Times New Roman';">${data.totalStudents}</span>名本科生中績點${rankCn.replace(/\d+/g, m => `<span style="font-family:'Times New Roman';">${m}</span>`)}。
-                    </p>
+                    <p style="text-indent: 32px; text-align: justify; margin-bottom: 40px;">${textCn}</p>
                     <p style="text-indent: 32px; margin-bottom: 60px;">特此證明。</p>
                     <div style="text-align: right; line-height: 1.6;">
                         澳門城市大學<br>金融學院<br><span style="font-family:'Times New Roman';">${data.date.cn.replace(/\d+/g, m => `<span style="font-family:'Times New Roman';">${m}</span>`)}</span>
                     </div>
                 </div>
 
-                <!-- 英文頁面 -->
                 <div class="word-page-en" style="${styleEn}">
                     <h3 style="text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 30px;">Certificate</h3>
-                    
                     <table border="0" cellspacing="0" cellpadding="6" style="${styleTable}">
                         <tr style="${styleEn}"><td style="width:18%;">Name:</td><td style="width:32%;">${data.nameEn}</td><td style="width:25%;">Date of Birth:</td><td style="width:25%;">${data.dob.en}</td></tr>
                         <tr style="${styleEn}"><td>Gender:</td><td>${data.genderEn}</td><td>Entry Year:</td><td>${data.entryYear}</td></tr>
@@ -446,10 +461,7 @@
                         ${tableRowEn}
                         <tr style="${styleEn}"><td>ID No.</td><td>${data.idNo}</td><td>EEP No.</td><td>${data.permitNo}</td></tr>
                     </table>
-                    
-                    <p style="text-align: justify; margin-bottom: 60px;">
-                        This is to certify that ${data.nameEn} (Class of ${data.entryYear}) with a general GPA of ${data.gpa} ${rankEn} among ${data.totalStudents} students during ${pronoun} study from ${academicYearEn} in Faculty of Finance.
-                    </p>
+                    <p style="text-align: justify; margin-bottom: 60px;">${textEn}</p>
                     <div style="text-align: right; line-height: 1.6;">
                         Faculty of Finance<br>City University of Macau<br>${data.date.en}
                     </div>
@@ -458,7 +470,6 @@
         }
 
         function updatePreview() {
-            // 在網頁預覽中，將中英文分開成兩個白色區塊顯示
             const html = generateCertHtml();
             document.getElementById('previewContent').innerHTML = html
                 .replace('class="word-page-cn"', 'class="word-page"')
@@ -466,65 +477,15 @@
         }
 
         function downloadWord() {
-            const progKey = document.getElementById('programme').value;
-            const progData = progMapping[progKey];
-            const specKey = document.getElementById('specialization').value;
-            const specData = specMapping[specKey];
-
-            const sY = document.getElementById('startYear').value;
-            const sM = document.getElementById('startMonth').value;
-            const eY = document.getElementById('endYear').value;
-            const eM = document.getElementById('endMonth').value;
-
-            const academicYearCn = `${sY}年${sM}月至${eY}年${eM}月`;
-            const academicYearEn = `${monthEnMapping[sM]} ${sY} to ${monthEnMapping[eM]} ${eY}`;
-
-            const data = {
-                nameCn: document.getElementById('nameCn').value,
-                nameEn: document.getElementById('nameEn').value.toUpperCase(),
-                dob: formatFullDate(document.getElementById('dob').value),
-                genderCn: document.getElementById('gender').value === 'male' ? '男' : '女',
-                genderEn: document.getElementById('gender').value === 'male' ? 'Male' : 'Female',
-                entryYear: document.getElementById('entryYear').value,
-                studentId: document.getElementById('studentId').value,
-                idNo: document.getElementById('idNo').value,
-                permitNo: document.getElementById('permitNo').value,
-                gpa: document.getElementById('gpa').value,
-                totalStudents: document.getElementById('totalStudents').value,
-                rankNum: parseInt(document.getElementById('rankNum').value) || 0,
-                isShared: document.getElementById('isShared').checked,
-                date: formatFullDate(document.getElementById('issueDate').value)
-            };
-
-            const rankCn = data.isShared ? `並列第${data.rankNum}` : `第${data.rankNum}`;
-            const rankEn = data.isShared ? `jointly ranked ${getOrdinalSuffix(data.rankNum)}` : `ranked ${getOrdinalSuffix(data.rankNum)}`;
-            const pronoun = data.genderEn === 'Male' ? 'his' : 'her';
-
-            const styleCn = "font-family: '標楷體', 'DFKai-SB', 'BiauKai', serif; line-height: 1.75; color: #000; font-size: 16px;";
-            const styleEn = "font-family: 'Times New Roman', serif; line-height: 1.75; color: #000; font-size: 15px;";
-            const styleTable = "width:100%; border-collapse:collapse; margin-bottom:25px; font-size:15px; border:none; mso-border-alt:none;";
-
-            let tableRowCn = '';
-            let tableRowEn = '';
-
-            if (progData.isMaster) {
-                tableRowCn = `<tr style="${styleCn}"><td>課程：</td><td colspan="3">${progData.cn}</td></tr>`;
-                tableRowEn = `<tr style="${styleEn}"><td>Programme:</td><td colspan="3">${progData.en}</td></tr>`;
-            } else {
-                tableRowCn = `<tr style="${styleCn}"><td>課程：</td><td style="width:45%;">${progData.cn}</td><td style="width:15%;">專業方向：</td><td style="width:25%;">${specData.cn}</td></tr>`;
-                tableRowEn = `<tr style="${styleEn}"><td>Programme:</td><td style="width:40%;">${progData.en}</td><td style="width:18%;">Specialization:</td><td style="width:24%;">${specData.en}</td></tr>`;
-            }
-
-            // 精確構建 Word 導出 HTML，確保第一頁不留白，中英文完美分頁
+            const htmlContent = generateCertHtml();
+            const nameCn = document.getElementById('nameCn').value;
+            const entryYear = document.getElementById('entryYear').value;
+            
+            // 完美修正 Word 分頁結構，消除第一頁白頁
             const fullHtml = `
                 <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
                 <head>
                     <title>Certificate</title>
-                    <!--[if gte mso 9]>
-                    <xml>
-                        <w:WordDocument><w:View>Print</w:View></w:WordDocument>
-                    </xml>
-                    <![endif]-->
                     <style>
                         body { margin: 0; padding: 0; }
                         table, td { border: none !important; }
@@ -532,45 +493,7 @@
                     </style>
                 </head>
                 <body>
-                    <!-- 第一頁：中文版 -->
-                    <div style="${styleCn}">
-                        <h3 style="text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 30px;">證 明</h3>
-                        <table border="0" cellspacing="0" cellpadding="6" style="${styleTable}">
-                            <tr style="${styleCn}"><td style="width:15%;">姓名：</td><td style="width:35%;">${data.nameCn}</td><td style="width:18%;">出生日期：</td><td style="width:32%; font-family:'Times New Roman';">${data.dob.cn}</td></tr>
-                            <tr style="${styleCn}"><td>性別：</td><td>${data.genderCn}</td><td>入學年：</td><td><span style="font-family:'Times New Roman';">${data.entryYear}</span>年</td></tr>
-                            <tr style="${styleCn}"><td>學院：</td><td>金融學院</td><td>學號：</td><td style="font-family:'Times New Roman';">${data.studentId}</td></tr>
-                            ${tableRowCn}
-                            <tr style="${styleCn}"><td>身份證：</td><td style="font-family:'Times New Roman';">${data.idNo}</td><td>港澳通行證：</td><td style="font-family:'Times New Roman';">${data.permitNo}</td></tr>
-                        </table>
-                        <p style="text-indent: 32px; text-align: justify; margin-bottom: 40px;">
-                            茲證明 ${data.nameCn} 於<span style="font-family:'Times New Roman';">${academicYearCn}</span>平均績點為<span style="font-family:'Times New Roman';">${data.gpa}</span>，在<span style="font-family:'Times New Roman';">${data.entryYear}</span>級金融學院<span style="font-family:'Times New Roman';">${data.totalStudents}</span>名本科生中績點${rankCn}。
-                        </p>
-                        <p style="text-indent: 32px; margin-bottom: 60px;">特此證明。</p>
-                        <div style="text-align: right; line-height: 1.6;">
-                            澳門城市大學<br>金融學院<br><span style="font-family:'Times New Roman';">${data.date.cn}</span>
-                        </div>
-                    </div>
-
-                    <!-- 強制分頁符號 -->
-                    <br class="page-break" />
-
-                    <!-- 第二頁：英文版 -->
-                    <div style="${styleEn}">
-                        <h3 style="text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 30px;">Certificate</h3>
-                        <table border="0" cellspacing="0" cellpadding="6" style="${styleTable}">
-                            <tr style="${styleEn}"><td style="width:18%;">Name:</td><td style="width:32%;">${data.nameEn}</td><td style="width:25%;">Date of Birth:</td><td style="width:25%;">${data.dob.en}</td></tr>
-                            <tr style="${styleEn}"><td>Gender:</td><td>${data.genderEn}</td><td>Entry Year:</td><td>${data.entryYear}</td></tr>
-                            <tr style="${styleEn}"><td>Department:</td><td>Faculty of Finance</td><td>Student ID:</td><td>${data.studentId}</td></tr>
-                            ${tableRowEn}
-                            <tr style="${styleEn}"><td>ID No.</td><td>${data.idNo}</td><td>EEP No.</td><td>${data.permitNo}</td></tr>
-                        </table>
-                        <p style="text-align: justify; margin-bottom: 60px;">
-                            This is to certify that ${data.nameEn} (Class of ${data.entryYear}) with a general GPA of ${data.gpa} ${rankEn} among ${data.totalStudents} students during ${pronoun} study from ${academicYearEn} in Faculty of Finance.
-                        </p>
-                        <div style="text-align: right; line-height: 1.6;">
-                            Faculty of Finance<br>City University of Macau<br>${data.date.en}
-                        </div>
-                    </div>
+                    ${htmlContent.replace('', '<br class="page-break" /> ')}
                 </body>
                 </html>
             `;
@@ -579,7 +502,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `FOF2526-ST323-${data.entryYear}學年成績排名證明-${data.nameCn}.doc`;
+            a.download = `FOF2526-ST323-${entryYear}學年成績排名證明-${nameCn}.doc`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
