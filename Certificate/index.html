@@ -121,6 +121,13 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             box-sizing: border-box;
         }
+        .section-ranking, .section-course {
+            background: #f7fafc;
+            padding: 15px;
+            border-left: 4px solid #3182ce;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -133,8 +140,8 @@
                 <h2>0. 選擇證明信類型</h2>
                 <div class="form-group">
                     <select id="certType" style="background-color: #ebf8ff; font-weight: bold; border-color: #bee3f8;">
-                        <option value="ranking" selected>📜 成績排名證明 (中英雙語)</option>
-                        <option value="course" disabled>🔒 專業科目證明信 (即將推出...)</option>
+                        <option value="ranking">📜 成績排名證明 (中英雙語)</option>
+                        <option value="course" selected>📚 專業科目證明信 (中英雙語)</option>
                         <option value="warning" disabled>🔒 學生警告信 (即將推出...)</option>
                         <option value="senior" disabled>🔒 大四學習科目證明 (即將推出...)</option>
                     </select>
@@ -145,15 +152,15 @@
                     <div class="form-group">
                         <label>學生姓名（中 / 英）：</label>
                         <div class="form-row">
-                            <input type="text" id="nameCn" value="陈佳楠" placeholder="中文姓名">
-                            <input type="text" id="nameEn" value="CHEN JIANAN" placeholder="英文姓名 (大寫)">
+                            <input type="text" id="nameCn" value="罗钰姗" placeholder="中文姓名">
+                            <input type="text" id="nameEn" value="LUO YUSHAN" placeholder="英文姓名 (大寫)">
                         </div>
                     </div>
                     
                     <div class="form-group">
                         <label>出生日期 / 性別：</label>
                         <div class="form-row">
-                            <input type="date" id="dob" value="2003-12-12">
+                            <input type="date" id="dob" value="2004-05-06">
                             <select id="gender">
                                 <option value="female" selected>女 / Female</option>
                                 <option value="male">男 / Male</option>
@@ -164,9 +171,8 @@
                     <div class="form-group">
                         <label>入學年份 / 學號：</label>
                         <div class="form-row">
-                            <select id="entryYear">
-                                </select>
-                            <input type="text" id="studentId" value="F2309010XXXX" placeholder="學號">
+                            <select id="entryYear"></select>
+                            <input type="text" id="studentId" value="F22090107600" placeholder="學號">
                         </div>
                     </div>
                     
@@ -182,56 +188,58 @@
                     <div class="form-group" id="specializationGroup">
                         <label>專業方向：</label>
                         <select id="specialization">
-                            <option value="economics" selected>經濟學 / Economics</option>
-                            <option value="finance">金融學 / Finance</option>
+                            <option value="finance" selected>金融學 / Finance</option>
+                            <option value="economics">經濟學 / Economics</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
                         <label>身份證號碼 / 港澳通行證號碼：</label>
                         <div class="form-row">
-                            <input type="text" id="idNo" value="33038220031212XXXX" placeholder="身份證">
-                            <input type="text" id="permitNo" value="CC4256792" placeholder="通行證">
+                            <input type="text" id="idNo" value="37028320040506972X" placeholder="身份證">
+                            <input type="text" id="permitNo" value="CC7384996" placeholder="通行證">
                         </div>
                     </div>
                     
-                    <hr>
-                    <h2>2. 排名與成績資訊</h2>
-                    
-                    <div class="form-group">
-                        <label>證明學年學期（開始學年 / 月份 至 結束學年 / 月份）：</label>
-                        <div class="form-row">
-                            <select id="startYear"></select>
-                            <select id="startMonth"></select>
-                            <span style="align-self: center;">至</span>
-                            <select id="endYear"></select>
-                            <select id="endMonth"></select>
+                    <div id="rankingFields" class="section-ranking" style="display:none;">
+                        <h3 style="font-size:14px; margin-top:0; color:#2b6cb0;">排名證明專用參數：</h3>
+                        <div class="form-group">
+                            <label>證明學年學期：</label>
+                            <div class="form-row">
+                                <select id="startYear"></select>
+                                <select id="startMonth"></select>
+                                <span style="align-self: center;">至</span>
+                                <select id="endYear"></select>
+                                <select id="endMonth"></select>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>平均 GPA（只需輸入數字，例如 3.94）：</label>
-                        <input type="text" id="gpa" value="3.94" placeholder="例如: 3.94">
+                        <div class="form-group">
+                            <label>平均 GPA：</label>
+                            <input type="text" id="gpa" value="3.94">
+                        </div>
+                        <div class="form-group">
+                            <label id="totalStudentsLabel">該學年總人數：</label>
+                            <input type="number" id="totalStudents" value="41">
+                        </div>
+                        <div class="form-group">
+                            <label>名次 / 是否並列：</label>
+                            <div class="form-row" style="align-items: center;">
+                                <input type="number" id="rankNum" value="1" style="width: 50%;">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="isShared" checked> 屬於「並列」排名
+                                </label>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label id="totalStudentsLabel">該學年總人數（系統偵測大三大四將自動轉為專業人數）：</label>
-                        <input type="number" id="totalStudents" value="41" placeholder="總人數">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>名次 (純數字) / 是否並列：</label>
-                        <div class="form-row" style="align-items: center;">
-                            <input type="number" id="rankNum" value="1" style="width: 50%;">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="isShared" checked> 屬於「並列」排名
-                            </label>
-                        </div>
+                    <div id="courseFields" class="section-course" style="display:none;">
+                        <h3 style="font-size:14px; margin-top:0; color:#2c5282;">專業科目證明提示：</h3>
+                        <p style="font-size:13px; color:#4a5568; margin:0;">系統已自動加載該課程大一至大四的標準教學計劃核心科目，無需手動粘貼。</p>
                     </div>
                     
                     <div class="form-group">
                         <label>簽發日期：</label>
-                        <input type="date" id="issueDate" value="2026-06-15">
+                        <input type="date" id="issueDate" value="2026-01-30">
                     </div>
                     
                     <button type="button" id="btnDownload" class="btn-primary">一鍵生成並導出 Word (.doc)</button>
@@ -247,6 +255,24 @@
     </div>
 
     <script>
+        // 靜態數據庫：大綱科目對照表 
+        const courseCurriculum = {
+            bachelor: {
+                cn: [
+                    { year: "第一學年", courses: ["微積分導論", "微觀經濟學導論", "會計學導論I", "線性代數導論", "宏觀經濟學導論", "會計學導論II"] },
+                    { year: "第二學年", courses: ["企業數學與統計學", "中級微觀經濟學", "金融學原理", "管理學原理", "量化分析", "中級宏觀經濟學", "金融市場簡介", "財務管理"] },
+                    { year: "第三學年", courses: ["計量經濟學導論", "金融經濟學導論", "公司金融", "投資學", "時間序列分析", "國際金融", "衍生品證券", "固定收益證券"] },
+                    { year: "第四學年", courses: ["學術專題項目I", "研究報告 I", "金融與經濟研究方法", "實證方法與建模", "金融前沿專題", "學術專題項目II", "研究報告 II", "金融機構管理", "風險管理簡介", "兼併與收購簡介"] }
+                ],
+                en: [
+                    { year: "Year One", courses: ["Introductory Calculus", "Introductory Microeconomics", "Introductory Accounting I", "Introductory Linear Algebra", "Introductory Macroeconomics", "Introductory Accounting II"] },
+                    { year: "Year Two", courses: ["Business Mathematics and Statistics", "Intermediate Microeconomics", "Principles of Finance", "Principles of Management", "Quantitative Methods Analysis", "Intermediate Macroeconomics", "Introduction to Financial Markets", "Financial Management"] },
+                    { year: "Year Three", courses: ["Econometrics", "Introductory Financial Economics", "Corporate Finance", "Investments", "Time Series Analysis", "International Finance", "Derivative Securities", "Fixed Income Securities"] },
+                    { year: "Year Four", courses: ["Special Academic Topics I", "Study Report I", "Research Methods in Finance & Economics", "Empirical Techniques and Modelling", "Contemporary Topics in Finance", "Special Academic Topics II", "Study Report II", "Management of Financial Institutions", "Introductory Risk Management", "Introductory Mergers and Acquisitions"] }
+                ]
+            }
+        };
+
         const progMapping = {
             bachelor: { cn: "應用經濟學學士學位課程 (中文學制)", en: "Bachelor of Applied Economics (Chinese)", isMaster: false },
             master_finance: { cn: "金融學碩士學位課程（中文學制）", en: "Master of Science in Finance（Chinese）", isMaster: true },
@@ -254,8 +280,8 @@
         };
 
         const specMapping = {
-            economics: { cn: "經濟學方向", en: "specializing in Economics" },
-            finance: { cn: "金融學方向", en: "specializing in Finance" }
+            economics: { cn: "經濟學方向", en: "specializing in Economics", rawCn: "經濟學", rawEn: "Economics" },
+            finance: { cn: "金融學方向", en: "specializing in Finance", rawCn: "金融學", rawEn: "Finance" }
         };
 
         const monthEnMapping = {
@@ -268,17 +294,13 @@
             
             const inputs = document.querySelectorAll('input, select');
             inputs.forEach(input => input.addEventListener('input', function() {
-                if (this.id === 'programme' || this.id === 'entryYear' || this.id === 'endYear') {
-                    toggleSpecializationField();
-                    updateLabelHint();
-                }
+                handleTypeAndProgChange();
                 updatePreview();
             }));
             
             document.getElementById('btnDownload').addEventListener('click', downloadWord);
             
-            toggleSpecializationField();
-            updateLabelHint();
+            handleTypeAndProgChange();
             updatePreview();
         });
 
@@ -294,7 +316,7 @@
                 startYearSel.add(new Option(`${y}年`, y));
                 endYearSel.add(new Option(`${y}年`, y));
             }
-            entryYearSel.value = "2023";
+            entryYearSel.value = "2022";
             startYearSel.value = "2025";
             endYearSel.value = "2026";
 
@@ -306,29 +328,25 @@
             endMonthSel.value = "7";
         }
 
-        function toggleSpecializationField() {
+        function handleTypeAndProgChange() {
+            const certType = document.getElementById('certType').value;
             const progKey = document.getElementById('programme').value;
-            const specGroup = document.getElementById('specializationGroup');
-            if (progMapping[progKey].isMaster) {
-                specGroup.style.display = 'none';
-            } else {
-                specGroup.style.display = 'block';
-            }
-        }
+            
+            // 控制證明專屬區塊隱顯
+            document.getElementById('rankingFields').style.display = certType === 'ranking' ? 'block' : 'none';
+            document.getElementById('courseFields').style.display = certType === 'course' ? 'block' : 'none';
 
-        // 提示標籤更新，方便行政人員操作
-        function updateLabelHint() {
+            // 控制專業方向隱顯（碩士隱藏）
+            document.getElementById('specializationGroup').style.display = progMapping[progKey].isMaster ? 'none' : 'block';
+
+            // 更新排名人數提示標籤
             const entryYear = parseInt(document.getElementById('entryYear').value);
             const endYear = parseInt(document.getElementById('endYear').value);
-            const progKey = document.getElementById('programme').value;
             const label = document.getElementById('totalStudentsLabel');
-            
             if (!progMapping[progKey].isMaster && (endYear - entryYear >= 3)) {
-                label.innerText = "該學年總人數（系統偵測：大三/大四 已分方向人數）：";
-            } else if (!progMapping[progKey].isMaster) {
-                label.innerText = "該學年總人數（系統偵測：大一/大二 學院總人數）：";
+                label.innerText = "該學年總人數（大三/大四 專業方向人數）：";
             } else {
-                label.innerText = "該學年總人數（碩士課程）：";
+                label.innerText = "該學年總人數（大一/大二 學院總人數）：";
             }
         }
 
@@ -352,23 +370,33 @@
             };
         }
 
+        // 核心：動態渲染專業科目表格 
+        function makeCourseTableHtml(lang) {
+            const curriculum = courseCurriculum.bachelor[lang];
+            let html = `<table border="1" cellspacing="0" cellpadding="6" style="width:100%; border-collapse:collapse; font-size:14px; border:1px solid #000; text-align:left; margin-bottom:20px;">`;
+            
+            curriculum.forEach(block => {
+                html += `<tr><td colspan="4" style="font-weight:bold; background-color:#f2f2f2; border:1px solid #000;">${block.year}</td></tr>`;
+                // 將科目以每 4 個一排進行分組渲染
+                for (let i = 0; i < block.courses.length; i += 4) {
+                    html += `<tr>`;
+                    for (let j = 0; j < 4; j++) {
+                        const courseName = block.courses[i + j] || '';
+                        html += `<td style="width:25%; border:1px solid #000; font-size:13px;">${courseName}</td>`;
+                    }
+                    html += `</tr>`;
+                }
+            });
+            html += `</table>`;
+            return html;
+        }
+
         function generateCertHtml() {
+            const certType = document.getElementById('certType').value;
             const progKey = document.getElementById('programme').value;
             const progData = progMapping[progKey];
             const specKey = document.getElementById('specialization').value;
             const specData = specMapping[specKey];
-
-            const sY = document.getElementById('startYear').value;
-            const sM = document.getElementById('startMonth').value;
-            const eY = document.getElementById('endYear').value;
-            const eM = document.getElementById('endMonth').value;
-
-            const academicYearCn = `${sY}年${sM}月至${eY}年${eM}月`;
-            const academicYearEn = `${monthEnMapping[sM]} ${sY} to ${monthEnMapping[eM]} ${eY}`;
-
-            // 處理 GPA，自動補齊 /4.0
-            let rawGpa = document.getElementById('gpa').value.trim();
-            const displayGpa = rawGpa.includes('/4.0') ? rawGpa : `${rawGpa}/4.0`;
 
             const data = {
                 nameCn: document.getElementById('nameCn').value,
@@ -380,89 +408,109 @@
                 studentId: document.getElementById('studentId').value,
                 idNo: document.getElementById('idNo').value,
                 permitNo: document.getElementById('permitNo').value,
-                totalStudents: document.getElementById('totalStudents').value,
-                rankNum: parseInt(document.getElementById('rankNum').value) || 0,
-                isShared: document.getElementById('isShared').checked,
                 date: formatFullDate(document.getElementById('issueDate').value)
             };
 
-            // 優化點 1：根據是否並列，完美切換「並列/排列」
-            const rankCn = data.isShared ? `並列第${data.rankNum}` : `排列第${data.rankNum}`;
-            const rankEn = data.isShared ? `jointly ranked ${getOrdinalSuffix(data.rankNum)}` : `ranked ${getOrdinalSuffix(data.rankNum)}`;
-            const pronoun = data.genderEn === 'Male' ? 'his' : 'her';
+            const styleCn = "font-family: '標楷體', 'DFKai-SB', serif; line-height: 1.6; color: #000; font-size: 16px;";
+            const styleEn = "font-family: 'Times New Roman', serif; line-height: 1.6; color: #000; font-size: 15px;";
+            const styleInfoTable = "width:100%; border-collapse:collapse; margin-bottom:25px; font-size:15px; border:none;";
 
-            // 優化點 3：智能判斷大幾並自動切換文案
-            let isSeniorUndergrad = (!progData.isMaster && (parseInt(eY) - parseInt(data.entryYear) >= 3));
-            
-            let scopeCn = '';
-            let scopeEn = '';
+            // 構建個人基本資料表格
+            let tableRowCn = progData.isMaster 
+                ? `<tr style="${styleCn}"><td>課程：</td><td colspan="3">${progData.cn}</td></tr>`
+                : `<tr style="${styleCn}"><td>課程：</td><td style="width:45%;">${progData.cn}</td><td style="width:15%;">專業方向：</td><td style="width:25%;">${specData.rawCn}</td></tr>`;
 
-            if (progData.isMaster) {
-                scopeCn = `在${data.entryYear}級金融學院${data.totalStudents}名碩士生中`;
-                scopeEn = `among ${data.totalStudents} students in Faculty of Finance`;
-            } else if (isSeniorUndergrad) {
-                // 大三、大四已分專業方向文案
-                scopeCn = `在${data.entryYear}級金融學院${specMapping[specKey].cn}${data.totalStudents}名本科生中`;
-                scopeEn = `among ${data.totalStudents} students ${specMapping[specKey].en} during ${pronoun} study from ${academicYearEn} in Faculty of Finance`;
+            let tableRowEn = progData.isMaster 
+                ? `<tr style="${styleEn}"><td>Programme:</td><td colspan="3">${progData.en}</td></tr>`
+                : `<tr style="${styleEn}"><td>Programme:</td><td style="width:40%;">${progData.en}</td><td style="width:18%;">Specialization:</td><td style="width:24%;">${specData.rawEn}</td></tr>`;
+
+            const baseTableCn = `
+                <table border="0" cellspacing="0" cellpadding="5" style="${styleInfoTable}">
+                    <tr style="${styleCn}"><td style="width:15%;">姓名：</td><td style="width:35%;">${data.nameCn}</td><td style="width:18%;">出生日期：</td><td style="width:32%; font-family:'Times New Roman';">${data.dob.cn}</td></tr>
+                    <tr style="${styleCn}"><td>性別：</td><td>${data.genderCn}</td><td>入學年：</td><td><span style="font-family:'Times New Roman';">${data.entryYear}</span>年</td></tr>
+                    <tr style="${styleCn}"><td>學院：</td><td>金融學院</td><td>學號：</td><td style="font-family:'Times New Roman';">${data.studentId}</td></tr>
+                    ${tableRowCn}
+                    <tr style="${styleCn}"><td>身份證：</td><td style="font-family:'Times New Roman';">${data.idNo}</td><td>港澳通行證：</td><td style="font-family:'Times New Roman';">${data.permitNo}</td></tr>
+                </table>`;
+
+            const baseTableEn = `
+                <table border="0" cellspacing="0" cellpadding="5" style="${styleInfoTable}">
+                    <tr style="${styleEn}"><td style="width:18%;">Name:</td><td style="width:32%;">${data.nameEn}</td><td style="width:25%;">Date of Birth:</td><td style="width:25%;">${data.dob.en}</td></tr>
+                    <tr style="${styleEn}"><td>Gender:</td><td>${data.genderEn}</td><td>Entry Year:</td><td>${data.entryYear}</td></tr>
+                    <tr style="${styleEn}"><td>Department:</td><td>Faculty of Finance</td><td>Student ID:</td><td>${data.studentId}</td></tr>
+                    ${tableRowEn}
+                    <tr style="${styleEn}"><td>ID No.</td><td>${data.idNo}</td><td>EEP No.</td><td>${data.permitNo}</td></tr>
+                </table>`;
+
+            // 根據類型渲染正文
+            let bodyCn = '', bodyEn = '', titleCn = '', titleEn = '';
+
+            if (certType === 'ranking') {
+                titleCn = "證 明"; titleEn = "Certificate";
+                const sY = document.getElementById('startYear').value, sM = document.getElementById('startMonth').value;
+                const eY = document.getElementById('endYear').value, eM = document.getElementById('endMonth').value;
+                const academicYearCn = `${sY}年${sM}月至${eY}年${eM}月`, academicYearEn = `${monthEnMapping[sM]} ${sY} to ${monthEnMapping[eM]} ${eY}`;
+                let rawGpa = document.getElementById('gpa').value.trim();
+                const displayGpa = rawGpa.includes('/4.0') ? rawGpa : `${rawGpa}/4.0`;
+                const totalStudents = document.getElementById('totalStudents').value;
+                const rankNum = parseInt(document.getElementById('rankNum').value) || 0;
+                const isShared = document.getElementById('isShared').checked;
+
+                const rankCn = isShared ? `並列第${rankNum}` : `排列第${rankNum}`;
+                const rankEn = isShared ? `jointly ranked ${getOrdinalSuffix(rankNum)}` : `ranked ${getOrdinalSuffix(rankNum)}`;
+                const pronoun = data.genderEn === 'Male' ? 'his' : 'her';
+
+                let scopeCn = '', scopeEn = '';
+                if (progData.isMaster) {
+                    scopeCn = `在${data.entryYear}級金融學院${totalStudents}名碩士生中`;
+                    scopeEn = `among ${totalStudents} students in Faculty of Finance`;
+                } else if (parseInt(eY) - parseInt(data.entryYear) >= 3) {
+                    scopeCn = `在${data.entryYear}級金融學院${specData.cn}${totalStudents}名本科生中`;
+                    scopeEn = `among ${totalStudents} students ${specData.en} during ${pronoun} study from ${academicYearEn} in Faculty of Finance`;
+                } else {
+                    scopeCn = `在${data.entryYear}級金融學院${totalStudents}名本科生中`;
+                    scopeEn = `among ${totalStudents} students during ${pronoun} study from ${academicYearEn} in Faculty of Finance`;
+                }
+
+                bodyCn = `
+                    <p style="text-indent: 32px; text-align: justify; margin-bottom: 40px;">
+                        茲證明 ${data.nameCn} 於<span style="font-family:'Times New Roman';">${academicYearCn}</span>平均績點為<span style="font-family:'Times New Roman';">${displayGpa}</span>，${scopeCn}績點${rankCn}。
+                    </p>
+                    <p style="text-indent: 32px; margin-bottom: 60px;">特此證明。</p>`;
+                bodyEn = `
+                    <p style="text-align: justify; margin-bottom: 60px;">
+                        This is to certify that ${data.nameEn} (Class of ${data.entryYear}) with a general GPA of ${displayGpa} ${rankEn} ${scopeEn}.
+                    </p>`;
             } else {
-                // 大一、大二未分專業方向文案
-                scopeCn = `在${data.entryYear}級金融學院${data.totalStudents}名本科生中`;
-                scopeEn = `among ${data.totalStudents} students during ${pronoun} study from ${academicYearEn} in Faculty of Finance`;
+                // 專業科目證明信模式 [cite: 16, 23]
+                titleCn = "證 明"; titleEn = "Certificate";
+                bodyCn = `
+                    <p style="text-indent: 32px; text-align: justify; margin-bottom: 15px;">
+                        茲證明 金融學院 ${progData.cn}之專業科目如下：
+                    </p>
+                    ${makeCourseTableHtml('cn')}
+                    <p style="text-indent: 32px; margin-bottom: 40px; margin-top:15px;">特此證明。</p>`;
+                bodyEn = `
+                    <p style="text-align: justify; margin-bottom: 15px;">
+                        This is to certify that the major subjects in ${progData.en}, Faculty of Finance are as follows:
+                    </p>
+                    ${makeCourseTableHtml('en')}`;
             }
-
-            const styleCn = "font-family: '標楷體', 'DFKai-SB', 'BiauKai', serif; line-height: 1.75; color: #000; font-size: 16px;";
-            const styleEn = "font-family: 'Times New Roman', serif; line-height: 1.75; color: #000; font-size: 15px;";
-            const styleTable = "width:100%; border-collapse:collapse; margin-bottom:25px; font-size:15px; border:none;";
-
-            let tableRowCn = '';
-            let tableRowEn = '';
-
-            if (progData.isMaster) {
-                tableRowCn = `<tr style="${styleCn}"><td>課程：</td><td colspan="3">${progData.cn}</td></tr>`;
-                tableRowEn = `<tr style="${styleEn}"><td>Programme:</td><td colspan="3">${progData.en}</td></tr>`;
-            } else {
-                // 本科生表格上方永遠保留原本格式
-                const specRaw = specKey === 'economics' ? '經濟學' : '金融學';
-                const specRawEn = specKey === 'economics' ? 'Economics' : 'Finance';
-                tableRowCn = `<tr style="${styleCn}"><td>課程：</td><td style="width:45%;">${progData.cn}</td><td style="width:15%;">專業方向：</td><td style="width:25%;">${specRaw}</td></tr>`;
-                tableRowEn = `<tr style="${styleEn}"><td>Programme:</td><td style="width:40%;">${progData.en}</td><td style="width:18%;">Specialization:</td><td style="width:24%;">${specRawEn}</td></tr>`;
-            }
-
-            // 處理正文字體數字
-            const textCn = `茲證明 ${data.nameCn} 於<span style="font-family:'Times New Roman';">${academicYearCn.replace(/\d+/g, m => `<span style="font-family:'Times New Roman';">${m}</span>`)}</span>平均績點為<span style="font-family:'Times New Roman';">${displayGpa}</span>，${scopeCn.replace(/\d+/g, m => `<span style="font-family:'Times New Roman';">${m}</span>`)}績點${rankCn.replace(/\d+/g, m => `<span style="font-family:'Times New Roman';">${m}</span>`)}。`;
-
-            const textEn = isSeniorUndergrad 
-                ? `This is to certify that ${data.nameEn} (Class of ${data.entryYear}) with a general GPA of ${displayGpa} ${rankEn} ${scopeEn}.`
-                : `This is to certify that ${data.nameEn} (Class of ${data.entryYear}) with a general GPA of ${displayGpa} ${rankEn} ${scopeEn}.`;
 
             return `
                 <div class="word-page-cn" style="${styleCn}">
-                    <h3 style="text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 30px; font-family: '標楷體', 'DFKai-SB';">證 明</h3>
-                    <table border="0" cellspacing="0" cellpadding="6" style="${styleTable}">
-                        <tr style="${styleCn}"><td style="width:15%;">姓名：</td><td style="width:35%;">${data.nameCn}</td><td style="width:18%;">出生日期：</td><td style="width:32%; font-family:'Times New Roman';">${data.dob.cn}</td></tr>
-                        <tr style="${styleCn}"><td>性別：</td><td>${data.genderCn}</td><td>入學年：</td><td><span style="font-family:'Times New Roman';">${data.entryYear}</span>年</td></tr>
-                        <tr style="${styleCn}"><td>學院：</td><td>金融學院</td><td>學號：</td><td style="font-family:'Times New Roman';">${data.studentId}</td></tr>
-                        ${tableRowCn}
-                        <tr style="${styleCn}"><td>身份證：</td><td style="font-family:'Times New Roman';">${data.idNo}</td><td>港澳通行證：</td><td style="font-family:'Times New Roman';">${data.permitNo}</td></tr>
-                    </table>
-                    <p style="text-indent: 32px; text-align: justify; margin-bottom: 40px;">${textCn}</p>
-                    <p style="text-indent: 32px; margin-bottom: 60px;">特此證明。</p>
+                    <h3 style="text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 25px;">${titleCn}</h3>
+                    ${baseTableCn}
+                    ${bodyCn}
                     <div style="text-align: right; line-height: 1.6;">
-                        澳門城市大學<br>金融學院<br><span style="font-family:'Times New Roman';">${data.date.cn.replace(/\d+/g, m => `<span style="font-family:'Times New Roman';">${m}</span>`)}</span>
+                        澳門城市大學<br>金融學院<br><span style="font-family:'Times New Roman';">${data.date.cn}</span>
                     </div>
                 </div>
-
                 <div class="word-page-en" style="${styleEn}">
-                    <h3 style="text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 30px;">Certificate</h3>
-                    <table border="0" cellspacing="0" cellpadding="6" style="${styleTable}">
-                        <tr style="${styleEn}"><td style="width:18%;">Name:</td><td style="width:32%;">${data.nameEn}</td><td style="width:25%;">Date of Birth:</td><td style="width:25%;">${data.dob.en}</td></tr>
-                        <tr style="${styleEn}"><td>Gender:</td><td>${data.genderEn}</td><td>Entry Year:</td><td>${data.entryYear}</td></tr>
-                        <tr style="${styleEn}"><td>Department:</td><td>Faculty of Finance</td><td>Student ID:</td><td>${data.studentId}</td></tr>
-                        ${tableRowEn}
-                        <tr style="${styleEn}"><td>ID No.</td><td>${data.idNo}</td><td>EEP No.</td><td>${data.permitNo}</td></tr>
-                    </table>
-                    <p style="text-align: justify; margin-bottom: 60px;">${textEn}</p>
-                    <div style="text-align: right; line-height: 1.6;">
+                    <h3 style="text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 25px;">${titleEn}</h3>
+                    ${baseTableEn}
+                    ${bodyEn}
+                    <div style="text-align: right; line-height: 1.6; margin-top: 30px;">
                         Faculty of Finance<br>City University of Macau<br>${data.date.en}
                     </div>
                 </div>
@@ -479,16 +527,15 @@
         function downloadWord() {
             const htmlContent = generateCertHtml();
             const nameCn = document.getElementById('nameCn').value;
+            const certType = document.getElementById('certType').value;
             const entryYear = document.getElementById('entryYear').value;
-            
-            // 完美修正 Word 分頁結構，消除第一頁白頁
+            const typeLabel = certType === 'ranking' ? '成績排名證明' : '專業科目證明';
+
             const fullHtml = `
                 <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
                 <head>
-                    <title>Certificate</title>
                     <style>
                         body { margin: 0; padding: 0; }
-                        table, td { border: none !important; }
                         .page-break { page-break-before: always; }
                     </style>
                 </head>
@@ -502,7 +549,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `FOF2526-ST323-${entryYear}學年成績排名證明-${nameCn}.doc`;
+            a.download = `FOF2526-ST-${entryYear}學年${typeLabel}-${nameCn}.doc`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
