@@ -75,7 +75,7 @@
                     
                     <div class="flex justify-between items-start">
                         <span class="text-xs font-extrabold tracking-wide bg-white/70 px-1.5 py-0.5 rounded text-gray-800 shadow-2xs">
-                            {{ b.programCode }}-{{ b.grade }}
+                            {{ b.programCode || getProgramCode(b.program) }}
                         </span>
                         <span class="text-[10px] font-bold bg-black/5 text-gray-700 px-1.5 py-0.5 rounded font-mono">
                             {{ b.className }}班
@@ -313,7 +313,7 @@
                                 
                                 <div class="flex flex-col justify-between flex-1">
                                     <div class="text-[9px] font-bold text-gray-500 mb-0.5 flex justify-between">
-                                        <span>{{ b.block.programCode }} {{ b.block.grade }}</span>
+                                        <span>{{ b.block.programCode || getProgramCode(b.block.program) }} {{ b.block.grade }}</span>
                                         <span class="bg-black/5 px-1 rounded font-mono">{{ b.block.className }}班</span>
                                     </div>
 
@@ -534,7 +534,7 @@
                 };
                 function getProgramCode(p) { return programCodes[p] || '科'; }
 
-                // 為了視覺美化，分配專屬的莫蘭迪品牌底色
+                // 分配專屬的莫蘭迪品牌底色
                 const colorMap = {
                     '應用經濟學學士學位課程 (BAE)': 'bg-emerald-50 border-emerald-200/80 hover:bg-emerald-100/50 text-emerald-900',
                     '金融學學士學位課程 (BFI)': 'bg-blue-50 border-blue-200/80 hover:bg-blue-100/50 text-blue-900',
@@ -550,7 +550,7 @@
                 const timetable = ref([]);        
 
                 // 視窗分頁狀態
-                const currentTab = ref('class'); // 'class' | 'teacher' | 'slot' | 'stats'
+                const currentTab = ref('class'); 
 
                 // 篩選過濾器狀態
                 const filterProgram = ref('');
@@ -565,7 +565,7 @@
                 // 老師快速追蹤與檢視變數
                 const searchTeacher = ref('');
 
-                // 🆕 PDF 批量打印變數
+                // PDF 批量打印變數
                 const showPrintModal = ref(false);
                 const selectedPrintClasses = ref([]);
                 const pdfQueueData = ref([]);
@@ -630,7 +630,7 @@
                     return Array.from(set).sort();
                 });
 
-                // 全院教師課時自動核算明細數據統計
+                // 全院教師課時自動核算明細數據統計 (✨ 完美補回容錯：若 programCode 不存在，自動查表對齊)
                 const teacherStatsList = computed(() => {
                     const map = {};
                     const initTeacher = (name) => {
@@ -643,7 +643,8 @@
                             initTeacher(tName);
                             map[tName].numerator += 1;
                             map[tName].denominator += 1;
-                            map[tName].classSet.add(`${item.block.programCode}-${item.block.grade}${item.block.className}班《${item.block.subject}》`);
+                            const pCode = item.block.programCode || getProgramCode(item.block.program);
+                            map[tName].classSet.add(`${pCode}-${item.block.grade}${item.block.className}班《${item.block.subject}》`);
                         }
                     });
                     
@@ -652,7 +653,8 @@
                         if (tName) {
                             initTeacher(tName);
                             map[tName].denominator += b.remained;
-                            map[tName].classSet.add(`${b.programCode}-${b.grade}${b.className}班《${b.subject}》`);
+                            const pCode = b.programCode || getProgramCode(b.program);
+                            map[tName].classSet.add(`${pCode}-${b.grade}${b.className}班《b.subject》`);
                         }
                     });
 
@@ -664,11 +666,10 @@
                     })).sort((a,b) => b.denominator - a.denominator);
                 });
 
-                // 拖拽傳輸介質變數
                 let draggingBlockInfo = null;
                 let draggingFromGridId = null;
 
-                // 🆕 PDF 打印函數
+                // PDF 打印函數
                 function openPrintModal() {
                     selectedPrintClasses.value = [];
                     showPrintModal.value = true;
@@ -722,7 +723,7 @@
                     pdfQueueData.value = queue;
                     showPrintModal.value = false;
                     
-                    alert(`⏳ 系統即將開始批量打包生成 ${queue.length} 個班級的 PDF 課表，請在瀏覽器彈出下載提示時點擊允許。`);
+                    alert(`⏳ 系統即將開始批量打包生成 ${queue.length} 個班級的 PDF 課表，請在下載提示時點擊允許。`);
                     
                     setTimeout(() => {
                         const container = document.getElementById('pdf-render-template');
@@ -760,7 +761,7 @@
                 function getTeacherElsewhereDetails(day, slot, currentTeacher, currentProgram, currentGrade, currentClassName, currentSubject) {
                     const sameTimeBlocks = timetable.value.filter(item => item.day === day && item.slot === slot);
                     
-                    // 💡 修正後邏輯：必須同時滿足【同老師】且【同科目】在不同班級，才算真正的行政合班
+                    // 💡 行政合班上課硬限制：同老師、同科目、不同班級
                     const combinedItem = sameTimeBlocks.find(item => 
                         item.block.teacher === currentTeacher &&
                         item.block.subject === currentSubject && 
@@ -773,7 +774,7 @@
                         };
                     }
 
-                    // 2. 判斷是否為普通教師衝突
+                    // 普通教師衝突
                     const conflictItem = sameTimeBlocks.find(item => 
                         item.block.teacher === currentTeacher && 
                         (item.block.program !== currentProgram || item.block.grade !== currentGrade || item.block.className !== currentClassName)
@@ -788,7 +789,6 @@
                     return { type: 'none', msg: '' };
                 }
 
-                // 被底層過濾器依賴的舊反饋格式
                 function checkTeacherHasClassElsewhere(day, slot, currentTeacher, currentProgram, currentGrade, currentClassName, currentSubject) {
                     return getTeacherElsewhereDetails(day, slot, currentTeacher, currentProgram, currentGrade, currentClassName, currentSubject).type;
                 }
@@ -799,7 +799,6 @@
                     return count;
                 }
 
-                // 棋盤單元格數據集讀取函數
                 function getCellBlocks(slot, day) {
                     return timetable.value.filter(item => 
                         item.slot === slot && 
@@ -810,10 +809,11 @@
                     );
                 }
 
+                // 修正：當老檔案數據還原時，格子也能完美追蹤到老師
                 function getTeacherCellBlocks(slot, day) {
                     if (!searchTeacher.value) return [];
                     return timetable.value.filter(item => 
-                        item.slot === slot && item.day === day && item.block.teacher === searchTeacher.value
+                        item.slot === slot && item.day === day && item.block.teacher.trim() === searchTeacher.value.trim()
                     );
                 }
 
@@ -821,7 +821,6 @@
                     return timetable.value.filter(item => item.slot === slot && item.day === day);
                 }
 
-                // 監控全院各節次排課飽和密度（高於全院總課量3%標紅）
                 function getSlotDensityClass(slot, day) {
                     const count = getSlotAllBlocks(slot, day).length;
                     if (count === 0) return 'bg-gray-100 text-gray-400';
@@ -832,12 +831,10 @@
                     return 'bg-slate-700 text-white';
                 }
 
-                // 彈窗表格動態增減行
                 function openModal() { showModal.value = true; }
                 function addFormRow() { formRows.value.push({ subject: '', teacher: '', weeks: 2 }); }
                 function removeFormRow(idx) { if(formRows.value.length > 1) formRows.value.splice(idx, 1); }
 
-                // 批量生成拼圖方塊並向左側注入
                 function generateBlocks() {
                     const { program, grade, classes } = formCommon.value;
                     if (!classes || classes.length === 0) { alert("請至少勾選一個適用班級！"); return; }
@@ -864,11 +861,9 @@
 
                     alert(`🎉 成功分班生成並向拼圖池注入 ${count} 個專屬拼圖切片塊！`);
                     showModal.value = false;
-                    // 重設動態行輸入框
                     formRows.value = [ { subject: '', teacher: '', weeks: 2 } ];
                 }
 
-                // 拖放機制邏輯內核
                 function onDragStartFromPool(e, block) {
                     draggingBlockInfo = block;
                     draggingFromGridId = null;
@@ -884,7 +879,6 @@
                 function onDrop(e, day, slot) {
                     if (!draggingBlockInfo) return;
 
-                    // 行政同班級在同一時段絕不允許重疊排兩節不同的課
                     const isOccupied = timetable.value.some(item => 
                         item.id !== draggingFromGridId &&
                         item.slot === slot && 
@@ -894,11 +888,10 @@
                         item.block.className === draggingBlockInfo.className
                     );
                     if (isOccupied) {
-                        alert(`❌ 排課衝突：${draggingBlockInfo.program} ${draggingBlockInfo.grade} ${draggingBlockInfo.className}班 在該時段已安排了其他課程，無法重疊！`);
+                        alert(`❌ 排課衝突：${draggingBlockInfo.program} ${draggingBlockInfo.grade} ${draggingBlockInfo.className}班 在該時段已安排了其他課程！`);
                         return;
                     }
 
-                    // 假若是從格子內部挪動
                     if (draggingFromGridId) {
                         const idx = timetable.value.findIndex(item => item.id === draggingFromGridId);
                         if (idx !== -1) {
@@ -906,7 +899,6 @@
                             timetable.value[idx].slot = slot;
                         }
                     } else {
-                        // 假若是從左側拼圖池首次拖入
                         const poolBlock = unassignedBlocks.value.find(b => b.id === draggingBlockInfo.id);
                         if (poolBlock && poolBlock.remained > 0) {
                             poolBlock.remained--;
@@ -938,13 +930,11 @@
                 function deleteUnassignedBlock(blockId) {
                     const idx = unassignedBlocks.value.findIndex(b => b.id === blockId);
                     if (idx !== -1) {
-                        // 同時銷毀棋盤上關聯的已排課堂
                         timetable.value = timetable.value.filter(item => item.block.id !== blockId);
                         unassignedBlocks.value.splice(idx, 1);
                     }
                 }
 
-                // 數據導出導入模塊（Excel & JSON）
                 function exportToExcel() {
                     if (timetable.value.length === 0) { alert("當前課表無任何排堂數據！"); return; }
                     
@@ -975,6 +965,7 @@
                     a.click();
                 }
 
+                // ✨ 修正導入邏輯：完美注入容錯，確保不論舊格式或新格式讀取，都能自動校正縮寫
                 function importData(e) {
                     const file = e.target.files[0];
                     if (!file) return;
@@ -983,11 +974,21 @@
                         try {
                             const parsed = JSON.parse(e.target.result);
                             if (parsed.unassignedBlocks && parsed.timetable) {
+                                // 強制校正與刷入縮寫欄位
+                                parsed.unassignedBlocks.forEach(b => {
+                                    if (!b.programCode) b.programCode = getProgramCode(b.program);
+                                });
+                                parsed.timetable.forEach(t => {
+                                    if (t.block && !t.block.programCode) t.block.programCode = getProgramCode(t.block.program);
+                                });
+
                                 unassignedBlocks.value = parsed.unassignedBlocks;
                                 timetable.value = parsed.timetable;
-                                alert("數據還原成功！");
+                                alert("🎉 數據已完美復原，舊格式兼容校正完畢！");
+                            } else {
+                                alert("備份格式不符");
                             }
-                        } catch (err) { alert("無效的文件。"); }
+                        } catch (err) { alert("無法讀取 JSON 文件。"); }
                     };
                     reader.readAsText(file);
                 }
@@ -1008,7 +1009,6 @@
                     openModal, addFormRow, removeFormRow, onDragStartFromPool, onDragStartFromGrid, onDrop, 
                     getCellBlocks, getTeacherCellBlocks, getSlotAllBlocks, getSlotDensityClass, removeSchedule, deleteUnassignedBlock, generateBlocks, exportToExcel, exportData, importData, clearAllSchedules,
                     currentTab, teacherStatsList,
-                    // 導出 PDF 變數與函數
                     showPrintModal, selectedPrintClasses, pdfQueueData, openPrintModal, selectAllPrintClasses, startBatchExportPDF
                 };
             }
