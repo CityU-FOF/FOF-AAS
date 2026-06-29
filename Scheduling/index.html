@@ -759,18 +759,16 @@ const pdfQueueData = ref([]);
                 }
 
                 // 🆕 新增：核心批量生成 PDF 並逐個下載
-                function startBatchExportPDF() {
+function startBatchExportPDF() {
                     if (selectedPrintClasses.value.length === 0) return;
                     
-                    // 1. 組裝要打印的各班級課表矩陣數據
                     const queue = [];
                     selectedPrintClasses.value.forEach(classKey => {
                         const [prog, grade, cls] = classKey.split('|');
-                        const progName = programs[prog] || prog;
-                        const titleText = `${progName} ${grade} ${cls}班`;
-                        const idStr = `${prog}-${grade}-${cls}`.replace(/\s+/g, '_');
+                        const titleText = `${prog} ${grade} ${cls}班`;
+                        // 修正：移除非法字元，確保 ID 安全
+                        const idStr = `${prog}-${grade}-${cls}`.replace(/[\s\(\)]+/g, '_');
                         
-                        // 初始化該班級的 8節 X 7天 課表格子
                         const gridData = {};
                         for (let s = 1; s <= 8; s++) {
                             gridData[s] = {};
@@ -779,11 +777,18 @@ const pdfQueueData = ref([]);
                             }
                         }
                         
-                        // 篩選出屬於該班級的已排課拼圖
+                        // 🔍 核心修正：確保篩選出來的數據結構，與 PDF 範本渲染預期的 item.block 完全一致
                         timetable.value.forEach(item => {
                             if (item.block.program === prog && item.block.grade === grade && item.block.className === cls) {
                                 if (gridData[item.slot] && gridData[item.slot][item.day]) {
-                                    gridData[item.slot][item.day].push(item);
+                                    // 確保塞進去的是包含 block 物件的完整結構
+                                    gridData[item.slot][item.day].push({
+                                        id: item.id,
+                                        block: {
+                                            subject: item.block.subject,
+                                            teacher: item.block.teacher
+                                        }
+                                    });
                                 }
                             }
                         });
@@ -799,11 +804,9 @@ const pdfQueueData = ref([]);
                     pdfQueueData.value = queue;
                     showPrintModal.value = false;
                     
-                    // 2. 利用 Vue 的 nextTick 或小延遲，等待 HTML 渲染完成後，調用 html2pdf 逐個導出
-                    alert(`⏳ 系統即將開始批量打包生成 ${queue.length} 個班級的 PDF 課表，請在瀏覽器彈出下載提示時予以允許。`);
+                    alert(`⏳ 系統即將開始批量打包生成 ${queue.length} 個班級的 PDF 課表，請在下載提示時點擊允許。`);
                     
                     setTimeout(() => {
-                        // 隱藏的範本容器短暫解除隱藏以供 html2pdf 抓取鏡像
                         const container = document.getElementById('pdf-render-template');
                         container.classList.remove('hidden');
                         
@@ -817,18 +820,16 @@ const pdfQueueData = ref([]);
                                     filename:     pdfItem.filename,
                                     image:        { type: 'jpeg', quality: 0.98 },
                                     html2canvas:  { scale: 2, useCORS: true, logging: false },
-                                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' } // 橫向橫版列印
+                                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
                                 };
-                                
                                 return html2pdf().set(opt).from(element).save();
                             });
                         });
                         
-                        // 全部完成後重新隱藏範本容器
                         promiseChain.then(() => {
                             container.classList.add('hidden');
                             pdfQueueData.value = [];
-                            alert('🎉 所有班級的 PDF 課表已全部單獨導出完成！');
+                            alert('🎉 所有指定的班級 PDF 課表已全部單獨導出完成！');
                         }).catch(err => {
                             console.error(err);
                             container.classList.add('hidden');
