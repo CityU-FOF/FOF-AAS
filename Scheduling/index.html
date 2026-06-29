@@ -730,12 +730,36 @@ const pdfQueueData = ref([]);
                     return timetable.value.some(item => item.day === day && item.slot === slot && item.block.teacher === searchTeacher.value);
                 }
 
-                function getTeacherElsewhereDetails(day, slot) {
-                    const found = timetable.value.find(item => item.day === day && item.slot === slot && item.block.teacher === searchTeacher.value);
-                    if (!found) return "";
-                    return `${found.block.subject} (${getProgramCode(found.block.program)}-${found.block.grade}${found.block.className}班)`;
+function getTeacherElsewhereDetails(day, slot, currentTeacher, currentProgram, currentGrade, currentClassName, currentSubject) {
+                const sameTimeBlocks = timetable.value.filter(item => item.day === day && item.slot === slot);
+                
+                // 💡 修正後邏輯：必須同時滿足「同一個老師」且「同一個科目」在不同班級，才算真正的【合班上課】
+                const combinedItem = sameTimeBlocks.find(item => 
+                    item.block.teacher === currentTeacher &&
+                    item.block.subject === currentSubject && 
+                    (item.block.program !== currentProgram || item.block.grade !== currentGrade || item.block.className !== currentClassName)
+                );
+                if (combinedItem) {
+                    return {
+                        type: 'combined',
+                        msg: `👥 合班上課：與 [${combinedItem.block.program} ${combinedItem.block.grade} ${combinedItem.block.className}班] 的《${combinedItem.block.subject}》合班`
+                    };
                 }
 
+                // 2. 判斷是否為普通教師衝突（同一個老師，但在這節課上了「不同的科目」或「非合班的其他班級」）
+                const conflictItem = sameTimeBlocks.find(item => 
+                    item.block.teacher === currentTeacher && 
+                    (item.block.program !== currentProgram || item.block.grade !== currentGrade || item.block.className !== currentClassName)
+                );
+                if (conflictItem) {
+                    return {
+                        type: 'conflict',
+                        msg: `⚠️ 衝突：${currentTeacher}老師此時段已在 [${conflictItem.block.program} ${conflictItem.block.grade} ${conflictItem.block.className}班] 有課《${conflictItem.block.subject}》`
+                    };
+                }
+
+                return { type: 'none', msg: '' };
+            }
                 function getTeacherLessonCount(teacherName) {
                     return timetable.value.filter(item => item.block.teacher === teacherName).length;
                 }
