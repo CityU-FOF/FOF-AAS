@@ -887,80 +887,68 @@ const pdfQueueData = ref([]);
                 }
 
 // 修改：升級拖拽投放邏輯，支援跨班級智能合班詢問提示
-                function onDrop(event, targetDay, targetSlot) {
-                    if (!draggedBlockData) return;
+// 修改：升級拖拽投放邏輯，支援跨班級智能合班詢問提示與嚴格教師衝突攔截
+function onDrop(event, targetDay, targetSlot) {
+    if (!draggedBlockData) return;
 
-                    // 1. 先行檢查：是不是同一個班級在同一時間安排了「完全不同」的科目？（這屬於絕對衝突，不允許合班）
-                    const absoluteClassConflict = timetable.value.find(item => 
-                        item !== originalGridItem && 
-                        item.day === targetDay && 
-                        item.slot === targetSlot && 
-                        item.block.program === draggedBlockData.program && 
-                        item.block.grade === draggedBlockData.grade && 
-                        item.block.className === draggedBlockData.className &&
-                        item.block.subject !== draggedBlockData.subject // 科目名稱不同
-                    );
-                    
-                    if (absoluteClassConflict) {
-                        alert(`❌【班級課表絕對衝突！】\n${draggedBlockData.grade}${draggedBlockData.className}班 該時段已有其他科目「${absoluteClassConflict.block.subject}」，無法在此安排合班！`);
-                        return;
-                    }
+    // 1. 遍歷全院課表，找出同一個時段（同 day、同 slot）是否存在同一個老師的排課
+    const existingLesson = timetable.value.find(item => 
+        item !== originalGridItem && 
+        item.day === targetDay && 
+        item.slot === targetSlot && 
+        item.block.teacher.trim() === draggedBlockData.teacher.trim()
+    );
 
-                    // 2. 智能探測：同一個年級的同一門科目，是不是已經在該時段被其他班級佔用了？（這屬於潜在合班情況）
-                    const potentialMergeConflict = timetable.value.find(item => 
-                        item !== originalGridItem && 
-                        item.day === targetDay && 
-                        item.slot === targetSlot && 
-                        item.block.program === draggedBlockData.program && 
-                        item.block.grade === draggedBlockData.grade && 
-                        item.block.subject === draggedBlockData.subject && // 同一科
-                        item.block.className !== draggedBlockData.className   // 但不同班 (例如 A 班碰上 B 班)
-                    );
+    if (existingLesson) {
+        // 【情況 A】同時代、同老師、同科目 ➡️ 潛在的行政合班
+        if (existingLesson.block.subject.trim() === draggedBlockData.subject.trim()) {
+            
+            // 如果連班級、年級、課程都完全一樣，代表是同一個方塊重複放，直接忽略
+            if (existingLesson.block.program === draggedBlockData.program &&
+                existingLesson.block.grade === draggedBlockData.grade &&
+                existingLesson.block.className === draggedBlockData.className) {
+                return;
+            }
 
-                    let isMergeApproved = false;
-                    if (potentialMergeConflict) {
-                        // 彈出確認詢問，要求使用者二次確認是否為合班
-                        const confirmMerge = confirm(
-                            `⚠️【發現排課衝突 / 潛在合班情況】\n\n` +
-                            `該時段已有「${potentialMergeConflict.block.grade}${potentialMergeConflict.block.className}班」在進行《${draggedBlockData.subject}》。\n` +
-                            `你現在正試圖將「${draggedBlockData.className}班」排入此處。\n\n` +
-                            `請問這是否屬於「${draggedBlockData.className}班」與「${potentialMergeConflict.block.className}班」合班聯合上課？`
-                        );
-                        
-                        if (!confirmMerge) {
-                            return; // 使用者取消，中斷排課操作
-                        }
-                        isMergeApproved = true; // 使用者同意合班
-                    }
+            // 彈出確認詢問，要求使用者二次確認是否為合班
+            const confirmMerge = confirm(
+                `⚠️【發現潛在合班情況】\n\n` +
+                `${draggedBlockData.teacher}老師 在該時段已有「${existingLesson.block.grade}${existingLesson.block.className}班」在進行《${draggedBlockData.subject}》。\n` +
+                `你現在正試圖將「${draggedBlockData.grade}${draggedBlockData.className}班」排入此處。\n\n` +
+                `請問這是否屬於多班級「聯合合班上課」？`
+            );
+            
+            if (!confirmMerge) {
+                return; // 使用者點擊「取消」，中斷排課操作，方塊彈回
+            }
+            // 使用者點擊「確定」，合班通過，豁免衝突，繼續往下執行排入程序
+        } 
+        // 【情況 B】同時代、同老師、但不同科目 ➡️ 嚴格的時間衝突
+        else {
+            alert(
+                `❌【教師時間撞堂！】\n\n` +
+                `${draggedBlockData.teacher}老師在該時段已被「${existingLesson.block.grade}${existingLesson.block.className}班」佔用！\n` +
+                `當時科目為：《${existingLesson.block.subject}》\n` +
+                `無法在此同時安排另一門不同的科目《${draggedBlockData.subject}》。`
+            );
+            return; // 嚴格攔截，中斷排課
+        }
+    }
 
-                    // 3. 教師衝突檢查：如果不是合班（或者是不同科目的老師），才報撞堂
-                    // 如果是合班（同一個老師、同一科、同一時間給不同班上課），則在合班通過的情況下豁免撞堂警告
-                    const teacherConflict = timetable.value.find(item => 
-                        item !== originalGridItem && 
-                        item.day === targetDay && 
-                        item.slot === targetSlot && 
-                        item.block.teacher === draggedBlockData.teacher
-                    );
+    // 2. 衝突檢查通過，執行排入程序
+    if (dragSource === 'pool') {
+        timetable.value.push({ day: targetDay, slot: targetSlot, block: draggedBlockData });
+        unassignedBlocks.value = unassignedBlocks.value.filter(b => b.id !== draggedBlockData.id);
+    } else if (dragSource === 'grid') {
+        if (originalGridItem) { 
+            originalGridItem.day = targetDay; 
+            originalGridItem.slot = targetSlot; 
+        }
+    }
 
-                    if (teacherConflict && !isMergeApproved) {
-                        alert(`❌【教師時間撞堂！】\n${draggedBlockData.teacher}老師該時段已在「${teacherConflict.block.grade}${teacherConflict.block.className}班」有其他課，無法排入！`);
-                        return;
-                    }
-
-                    // 4. 執行排入程序
-                    if (dragSource === 'pool') {
-                        timetable.value.push({ day: targetDay, slot: targetSlot, block: draggedBlockData });
-                        unassignedBlocks.value = unassignedBlocks.value.filter(b => b.id !== draggedBlockData.id);
-                    } else if (dragSource === 'grid') {
-                        if (originalGridItem) { 
-                            originalGridItem.day = targetDay; 
-                            originalGridItem.slot = targetSlot; 
-                        }
-                    }
-
-                    dragSource = null; draggedBlockData = null; originalGridItem = null;
-                }
-
+    // 重置拖拽臨時變數
+    dragSource = null; draggedBlockData = null; originalGridItem = null;
+}
                 function getCellBlocks(day, slot) {
                     return timetable.value.filter(item => {
                         return item.day === day && item.slot === slot &&
